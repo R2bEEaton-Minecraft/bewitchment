@@ -4,10 +4,6 @@
 
 package moriyashiine.bewitchment.common.registry;
 
-import com.terraformersmc.terraform.sign.block.TerraformHangingSignBlock;
-import com.terraformersmc.terraform.sign.block.TerraformSignBlock;
-import com.terraformersmc.terraform.sign.block.TerraformWallHangingSignBlock;
-import com.terraformersmc.terraform.sign.block.TerraformWallSignBlock;
 import dev.emi.trinkets.api.TrinketItem;
 import moriyashiine.bewitchment.api.BewitchmentAPI;
 import moriyashiine.bewitchment.api.block.CandelabraBlock;
@@ -388,15 +384,7 @@ public class BWObjects {
 	}
 
 	private static Pair<Identifier, Identifier> createSign(String name) {
-		TerraformSignBlock sign = create(name + "_sign", new TerraformSignBlock(Bewitchment.id("entity/signs/" + name), copyOf(Blocks.OAK_SIGN)), false);
-		Block wallSign = create(name + "_wall_sign", new TerraformWallSignBlock(sign.getTexture(), copyOf(Blocks.OAK_WALL_SIGN).drops(Bewitchment.id("blocks/" + name + "_sign"))), false);
-
-		TerraformHangingSignBlock hangingSign = create(name + "_hanging_sign", new TerraformHangingSignBlock(Bewitchment.id("entity/signs/hanging/" + name), Bewitchment.id("textures/gui/hanging_signs/" + name), copyOf(Blocks.OAK_HANGING_SIGN)), false);
-		Block wallHangingSign = create(name + "_wall_hanging_sign", new TerraformWallHangingSignBlock(hangingSign.getTexture(), hangingSign.getGuiTexture(), copyOf(Blocks.OAK_WALL_HANGING_SIGN).drops(Bewitchment.id("blocks/" + name + "_hanging_sign"))), false);
-
-		create(name + "_sign", new SignItem(gen().maxCount(16), sign, wallSign));
-		create(name + "_hanging_sign", new HangingSignItem(hangingSign, wallHangingSign, gen().maxCount(16)));
-		return new Pair<>(sign.getTexture(), hangingSign.getTexture());
+		return new Pair<>(Bewitchment.id("entity/signs/" + name), Bewitchment.id("entity/signs/hanging/" + name));
 	}
 
 	private static Block[] createAltar(String name, FabricBlockSettings settings) {

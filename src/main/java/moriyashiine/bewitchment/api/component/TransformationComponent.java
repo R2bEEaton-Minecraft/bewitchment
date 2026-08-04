@@ -4,8 +4,6 @@
 
 package moriyashiine.bewitchment.api.component;
 
-import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
-import dev.emi.stepheightentityattribute.StepHeightEntityAttributeMain;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import moriyashiine.bewitchment.api.BewitchmentAPI;
@@ -184,9 +182,9 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 		EntityAttributeInstance armorAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_ARMOR);
 		EntityAttributeInstance armorToughnessAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
 		EntityAttributeInstance movementSpeedAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-		EntityAttributeInstance attackRange = obj.getAttributeInstance(ReachEntityAttributes.ATTACK_RANGE);
-		EntityAttributeInstance reach = obj.getAttributeInstance(ReachEntityAttributes.REACH);
-		EntityAttributeInstance stepHeight = obj.getAttributeInstance(StepHeightEntityAttributeMain.STEP_HEIGHT);
+		EntityAttributeInstance attackRange = obj.getAttributeInstance(EntityAttributes.GENERIC_LUCK);
+		EntityAttributeInstance reach = obj.getAttributeInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE);
+		EntityAttributeInstance stepHeight = obj.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
 		boolean shouldHave = vampire && !BewitchmentAPI.isPledged(obj, BWPledges.LILITH);
 		if (shouldHave && !attackDamageAttribute.hasModifier(VAMPIRE_ATTACK_DAMAGE_MODIFIER_0)) {
 			attackDamageAttribute.addPersistentModifier(VAMPIRE_ATTACK_DAMAGE_MODIFIER_0);

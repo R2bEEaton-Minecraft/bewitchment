@@ -54,7 +54,6 @@
 	"familiar.SwoopMovementGoalMixin",
 	"fortune.BlockMixin",
 	"fortune.LivingEntityMixin",
-	"integration.apoli.PreventItemUsePowerMixin",
 	"pledge.EntityMixin",
 	"pledge.LivingEntityMixin",
 	"pledge.MobEntityMixin",

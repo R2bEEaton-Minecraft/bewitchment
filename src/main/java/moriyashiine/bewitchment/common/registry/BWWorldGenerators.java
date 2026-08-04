@@ -88,10 +88,10 @@ public class BWWorldGenerators {
 			Identifier seeds = Bewitchment.id("inject/seeds");
 			Identifier nether_fortress = Bewitchment.id("inject/nether_fortress");
 			if (Blocks.GRASS.getLootTableId().equals(id) || Blocks.FERN.getLootTableId().equals(id) || Blocks.TALL_GRASS.getLootTableId().equals(id) || Blocks.LARGE_FERN.getLootTableId().equals(id)) {
-				tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(seeds).weight(1)).build());
+				tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(seeds).weight(1)));
 			}
 			if (LootTables.NETHER_BRIDGE_CHEST.equals(id)) {
-				tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(nether_fortress).weight(1)).build());
+				tableBuilder.pool(LootPool.builder().with(LootTableEntry.builder(nether_fortress).weight(1)));
 			}
 		});
 	}

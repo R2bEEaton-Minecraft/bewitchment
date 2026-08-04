@@ -5,7 +5,6 @@
 package moriyashiine.bewitchment.common.component.entity;
 
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
-import io.github.ladysnake.impersonate.Impersonator;
 import moriyashiine.bewitchment.common.registry.BWStatusEffects;
 import moriyashiine.bewitchment.common.statuseffect.PolymorphStatusEffect;
 import net.minecraft.entity.Entity;
@@ -45,7 +44,6 @@ public class PolymorphComponent implements ServerTickingComponent {
 		if (obj instanceof PlayerEntity player && getUuid() != null && !player.hasStatusEffect(BWStatusEffects.POLYMORPH)) {
 			setUuid(null);
 			setName(null);
-			Impersonator.get(player).stopImpersonation(PolymorphStatusEffect.IMPERSONATE_IDENTIFIER);
 		}
 	}
 
