@@ -29,7 +29,7 @@ public abstract class ActiveTargetGoalMixin<T extends LivingEntity> extends Trac
 
 	@Inject(method = "findClosestTarget", at = @At("TAIL"))
 	private void findClosestTarget(CallbackInfo callbackInfo) {
-		if (targetEntity instanceof PlayerEntity player && BWComponents.FULL_INVISIBILITY_COMPONENT.get(player).isFullInvisible()) {
+		if (targetEntity instanceof PlayerEntity player && BWComponents.isFullyInvisible(player)) {
 			targetEntity = null;
 		} else if (BWComponents.MINION_COMPONENT.get(mob).getMaster() == null && mob.isUndead() && targetEntity != null && BWUtil.getArmorPieces(targetEntity, stack -> stack.getItem() == BWObjects.HARBINGER) > 0) {
 			targetEntity = null;

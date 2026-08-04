@@ -47,7 +47,7 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
 			callbackInfo.cancel();
 			return;
 		}
-		if (BWComponents.FULL_INVISIBILITY_COMPONENT.get(player).isFullInvisible()) {
+		if (BWComponents.isFullyInvisible(player)) {
 			callbackInfo.cancel();
 			return;
 		}

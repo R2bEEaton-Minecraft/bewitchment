@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EntityRenderDispatcherMixin {
 	@Inject(method = "renderShadow", at = @At("HEAD"), cancellable = true)
 	private static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Entity entity, float opacity, float tickDelta, WorldView world, float radius, CallbackInfo callbackInfo) {
-		if (entity instanceof PlayerEntity player && BWComponents.FULL_INVISIBILITY_COMPONENT.get(player).isFullInvisible()) {
+		if (entity instanceof PlayerEntity player && BWComponents.isFullyInvisible(player)) {
 			callbackInfo.cancel();
 		}
 	}

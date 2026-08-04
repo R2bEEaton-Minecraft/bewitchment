@@ -38,7 +38,14 @@ public final class ContributorHornsFeatureRenderer extends FeatureRenderer<Abstr
 
 	public ContributorHornsFeatureRenderer(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context, EntityModelLoader loader) {
 		super(context);
-		MODEL = new ContributorHornsModel(loader.getModelPart(BewitchmentClient.CONTRIBUTOR_HORNS_MODEL_LAYER));
+		try {
+			MODEL = new ContributorHornsModel(loader.getModelPart(BewitchmentClient.CONTRIBUTOR_HORNS_MODEL_LAYER));
+		} catch (IllegalArgumentException ignored) {
+			// Forge can construct the player renderer before its compatibility
+			// layer registry is populated. The model data is self-contained, so
+			// baking it here preserves the same contributor-horns rendering.
+			MODEL = new ContributorHornsModel(ContributorHornsModel.getTexturedModelData().createModel());
+		}
 	}
 
 	@Override

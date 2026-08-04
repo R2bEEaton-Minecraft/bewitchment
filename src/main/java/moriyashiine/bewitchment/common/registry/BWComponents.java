@@ -33,4 +33,9 @@ public final class BWComponents {
 	public static final ComponentKey<FakeMobComponent> FAKE_MOB_COMPONENT = new ComponentKey<>(entity -> new FakeMobComponent((MobEntity) entity));
 	public static final ComponentKey<WerewolfVillagerComponent> WEREWOLF_VILLAGER_COMPONENT = new ComponentKey<>(entity -> new WerewolfVillagerComponent((VillagerEntity) entity));
 	public static final ComponentKey<CaduceusFireballComponent> CADUCEUS_FIREBALL_COMPONENT = new ComponentKey<>(entity -> new CaduceusFireballComponent());
+
+	/** Keeps component implementation types out of mixin signatures. */
+	public static boolean isFullyInvisible(PlayerEntity player) {
+		return FULL_INVISIBILITY_COMPONENT.get(player).isFullInvisible();
+	}
 }
