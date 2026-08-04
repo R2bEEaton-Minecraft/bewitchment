@@ -27,7 +27,6 @@ import moriyashiine.bewitchment.common.world.generator.tree.generator.ElderSapli
 import moriyashiine.bewitchment.common.world.generator.tree.generator.JuniperSaplingGenerator;
 import moriyashiine.bewitchment.mixin.BlocksAccessor;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
@@ -59,7 +58,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings.copyOf;
+import static net.minecraft.block.AbstractBlock.Settings.copy;
 
 public class BWObjects {
 	private static final Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
@@ -69,20 +68,20 @@ public class BWObjects {
 	public static ItemGroup GROUP;
 
 	//misc_no_item
-	public static final Block SALT_LINE = create("salt_line", new SaltLineBlock(copyOf(Blocks.REDSTONE_WIRE)), false);
-	public static final Block TEMPORARY_COBWEB = create("temporary_cobweb", new CobwebBlock(copyOf(Blocks.COBWEB).ticksRandomly()) {
+	public static final Block SALT_LINE = create("salt_line", new SaltLineBlock(copy(Blocks.REDSTONE_WIRE)), false);
+	public static final Block TEMPORARY_COBWEB = create("temporary_cobweb", new CobwebBlock(copy(Blocks.COBWEB).ticksRandomly()) {
 		@Override
 		public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
 	}, false);
-	public static final Block GOLDEN_GLYPH = create("golden_glyph", new GlyphBlock(FabricBlockSettings.create().sounds(new BlockSoundGroup(1, 1, SoundEvents.BLOCK_STONE_BREAK, SoundEvents.BLOCK_STONE_STEP, BWSoundEvents.BLOCK_GLPYH_PLACE, SoundEvents.BLOCK_STONE_HIT, SoundEvents.BLOCK_STONE_FALL)).pistonBehavior(PistonBehavior.DESTROY).noCollision().strength(1, 0)), false);
-	public static final Block GLYPH = create("glyph", new GlyphBlock(copyOf(GOLDEN_GLYPH)), false);
-	public static final Block FIERY_GLYPH = create("fiery_glyph", new GlyphBlock(copyOf(GOLDEN_GLYPH).luminance(4)), false);
-	public static final Block ELDRITCH_GLYPH = create("eldritch_glyph", new GlyphBlock(copyOf(GOLDEN_GLYPH).luminance(2)), false);
-	public static final Block SIGIL = create("sigil", new SigilBlock(FabricBlockSettings.create().pistonBehavior(PistonBehavior.DESTROY).sounds(BlockSoundGroup.BAMBOO).noCollision().breakInstantly()), false);
+	public static final Block GOLDEN_GLYPH = create("golden_glyph", new GlyphBlock(AbstractBlock.Settings.create().sounds(new BlockSoundGroup(1, 1, SoundEvents.BLOCK_STONE_BREAK, SoundEvents.BLOCK_STONE_STEP, BWSoundEvents.BLOCK_GLPYH_PLACE, SoundEvents.BLOCK_STONE_HIT, SoundEvents.BLOCK_STONE_FALL)).pistonBehavior(PistonBehavior.DESTROY).noCollision().strength(1, 0)), false);
+	public static final Block GLYPH = create("glyph", new GlyphBlock(copy(GOLDEN_GLYPH)), false);
+	public static final Block FIERY_GLYPH = create("fiery_glyph", new GlyphBlock(copy(GOLDEN_GLYPH).luminance(state -> 4)), false);
+	public static final Block ELDRITCH_GLYPH = create("eldritch_glyph", new GlyphBlock(copy(GOLDEN_GLYPH).luminance(state -> 2)), false);
+	public static final Block SIGIL = create("sigil", new SigilBlock(AbstractBlock.Settings.create().pistonBehavior(PistonBehavior.DESTROY).sounds(BlockSoundGroup.BAMBOO).noCollision().breakInstantly()), false);
 	//crop
-	public static final Block ACONITE_CROP = create("aconite", new BWCropBlock(copyOf(Blocks.WHEAT)), false);
+	public static final Block ACONITE_CROP = create("aconite", new BWCropBlock(copy(Blocks.WHEAT)), false);
 	public static final Block BELLADONNA_CROP = create("belladonna", new BWCropBlock(copyOf(ACONITE_CROP)), false);
 	public static final Block GARLIC_CROP = create("garlic", new BWCropBlock(copyOf(ACONITE_CROP)), false);
 	public static final Block MANDRAKE_CROP = create("mandrake", new BWCropBlock(copyOf(ACONITE_CROP)), false);
@@ -171,8 +170,8 @@ public class BWObjects {
 	public static final Block TRAPPED_DRAGONS_BLOOD_CHEST = create("trapped_dragons_blood_chest", new DragonsBloodChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.DRAGONS_BLOOD_CHEST, true), true);
 	public static final Pair<Identifier, Identifier> DRAGONS_BLOOD_SIGN = createSign("dragons_blood");
 	//other_plants
-	public static final Block GLOWING_BRAMBLE = create("glowing_bramble", new BrambleBlock(FabricBlockSettings.create().sounds(BlockSoundGroup.GRASS).strength(2, 3).noCollision().ticksRandomly().luminance(15)), true);
-	public static final Block ENDER_BRAMBLE = create("ender_bramble", new BrambleBlock(FabricBlockSettings.create().sounds(BlockSoundGroup.GRASS).strength(2, 3).noCollision().ticksRandomly()), true);
+	public static final Block GLOWING_BRAMBLE = create("glowing_bramble", new BrambleBlock(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS).strength(2, 3).noCollision().ticksRandomly().luminance(state -> 15)), true);
+	public static final Block ENDER_BRAMBLE = create("ender_bramble", new BrambleBlock(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS).strength(2, 3).noCollision().ticksRandomly()), true);
 	public static final Block FRUITING_BRAMBLE = create("fruiting_bramble", new BrambleBlock.Fruiting(copyOf(ENDER_BRAMBLE)), true);
 	public static final Block SCORCHED_BRAMBLE = create("scorched_bramble", new BrambleBlock(copyOf(ENDER_BRAMBLE)), true);
 	public static final Block THICK_BRAMBLE = create("thick_bramble", new BrambleBlock(copyOf(ENDER_BRAMBLE)), true);
@@ -383,11 +382,15 @@ public class BWObjects {
 		return new Item.Settings();
 	}
 
+	private static AbstractBlock.Settings copyOf(AbstractBlock block) {
+		return copy(block);
+	}
+
 	private static Pair<Identifier, Identifier> createSign(String name) {
 		return new Pair<>(Bewitchment.id("entity/signs/" + name), Bewitchment.id("entity/signs/hanging/" + name));
 	}
 
-	private static Block[] createAltar(String name, FabricBlockSettings settings) {
+	private static Block[] createAltar(String name, AbstractBlock.Settings settings) {
 		settings = settings.luminance(blockState -> blockState.get(Properties.LEVEL_15));
 		Block[] altars = new Block[21];
 		WitchAltarBlock unformed = create(name, new WitchAltarBlock(settings, null, false), true);
