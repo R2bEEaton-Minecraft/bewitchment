@@ -73,6 +73,7 @@ public final class BewitchmentForge {
 final class BewitchmentForgeModEvents {
 
 	public static void commonSetup(FMLCommonSetupEvent event) {
+		event.enqueueWork(BWObjects::init);
 		event.enqueueWork(Bewitchment::registerAltarMapEntries);
 		// Biome modifiers, loot table injection and spawn restrictions are
 		// registration-time APIs, so they belong in setup rather than a registry

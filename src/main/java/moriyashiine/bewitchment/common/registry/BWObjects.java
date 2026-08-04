@@ -464,11 +464,12 @@ public class BWObjects {
 	}
 
 	private static void registerStrippables() {
-		Map<Block, Block> stripped = AxeItemAccessor.getStrippedBlocks();
+		Map<Block, Block> stripped = new java.util.HashMap<>(AxeItemAccessor.getStrippedBlocks());
 		stripped.put(JUNIPER_LOG, STRIPPED_JUNIPER_LOG); stripped.put(JUNIPER_WOOD, STRIPPED_JUNIPER_WOOD);
 		stripped.put(CYPRESS_LOG, STRIPPED_CYPRESS_LOG); stripped.put(CYPRESS_WOOD, STRIPPED_CYPRESS_WOOD);
 		stripped.put(ELDER_LOG, STRIPPED_ELDER_LOG); stripped.put(ELDER_WOOD, STRIPPED_ELDER_WOOD);
 		stripped.put(DRAGONS_BLOOD_LOG, STRIPPED_DRAGONS_BLOOD_LOG); stripped.put(DRAGONS_BLOOD_WOOD, STRIPPED_DRAGONS_BLOOD_WOOD);
+		AxeItemAccessor.setStrippedBlocks(stripped);
 	}
 
 	private static void registerFlammables() {
@@ -482,8 +483,7 @@ public class BWObjects {
 	}
 
 	private static void registerFlammable(Block block, int encouragement, int flammability) {
-		// Forge's fire chance tables are private in 1.20.1. This is retained as a
-		// single porting hook until the block registration layer is fully deferred.
+		((moriyashiine.bewitchment.mixin.FireBlockAccessor) Blocks.FIRE).bw$registerFlammable(block, encouragement, flammability);
 	}
 
 	private static void registerCompostables() {
