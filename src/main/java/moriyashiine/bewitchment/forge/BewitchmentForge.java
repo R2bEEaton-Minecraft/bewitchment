@@ -6,6 +6,7 @@ import moriyashiine.bewitchment.client.model.ContributorHornsModel;
 import moriyashiine.bewitchment.client.model.entity.living.*;
 import moriyashiine.bewitchment.client.model.equipment.armor.WitchArmorModel;
 import moriyashiine.bewitchment.client.model.equipment.trinket.*;
+import moriyashiine.bewitchment.common.BWConfig;
 import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.entity.living.*;
 import moriyashiine.bewitchment.common.registry.*;
@@ -16,6 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -34,6 +36,8 @@ import net.minecraft.registry.RegistryKeys;
 public final class BewitchmentForge {
 
     public BewitchmentForge() {
+        // World generation reads the config during setup, so load it first.
+        BWConfig.load(FMLPaths.CONFIGDIR.get());
         // Component keys must all exist before the first entity is constructed,
         // because attaching the capability enumerates them.
         BWComponents.init();
@@ -70,6 +74,11 @@ final class BewitchmentForgeModEvents {
 
 	public static void commonSetup(FMLCommonSetupEvent event) {
 		event.enqueueWork(Bewitchment::registerAltarMapEntries);
+		// Biome modifiers, loot table injection and spawn restrictions are
+		// registration-time APIs, so they belong in setup rather than a registry
+		// event.  Without this there are no Bewitchment trees, no salt or silver
+		// ore, and none of the mod's mobs ever spawn naturally.
+		event.enqueueWork(BWWorldGenerators::init);
 	}
 
 	public static void registerContent(RegisterEvent event) {
@@ -85,6 +94,8 @@ final class BewitchmentForgeModEvents {
 			BWEntityTypes.init();
 		} else if (event.getRegistryKey().equals(RegistryKeys.STATUS_EFFECT)) {
 			moriyashiine.bewitchment.common.registry.BWStatusEffects.init();
+		} else if (event.getRegistryKey().equals(RegistryKeys.ENCHANTMENT)) {
+			BWEnchantments.init();
 		} else if (event.getRegistryKey().equals(RegistryKeys.SOUND_EVENT)) {
 			moriyashiine.bewitchment.common.registry.BWSoundEvents.init();
 		} else if (event.getRegistryKey().equals(RegistryKeys.PARTICLE_TYPE)) {

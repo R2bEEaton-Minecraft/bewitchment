@@ -5,6 +5,7 @@
 package moriyashiine.bewitchment.client.integration.emi;
 
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -16,6 +17,8 @@ import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.registry.BWObjects;
 import moriyashiine.bewitchment.common.registry.BWRecipeTypes;
 
+/** Forge discovers EMI plugins by annotation; Fabric reads the entrypoint in fabric.mod.json. */
+@EmiEntrypoint
 public class BWEmiIntegration implements EmiPlugin {
 	private static final EmiStack ATHAME_WORKSTATION = EmiStack.of(BWObjects.ATHAME);
 	private static final EmiStack GOLDEN_CHALK_WORKSTATION = EmiStack.of(BWObjects.GOLDEN_CHALK);

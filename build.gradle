@@ -49,9 +49,9 @@ loom {
     }
 }
 
-// EMI and Apoli are optional integrations. Their Fabric entrypoints are not
-// loaded by Forge while their platform-native replacements are migrated.
-sourceSets.main.java.exclude('moriyashiine/bewitchment/client/integration/emi/**')
+// EMI publishes a Forge build and its plugin API is loader-neutral, so that
+// integration is compiled and discovered through @EmiEntrypoint.  Apoli has no
+// Forge release, so its compatibility mixin stays out of the build.
 sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
 
 repositories {
@@ -75,6 +75,8 @@ dependencies {
     modImplementation "vazkii.patchouli:Patchouli:${patchouli_version}"
     modImplementation "top.theillusivec4.curios:curios-forge:${curios_version}"
     modImplementation "squeek.appleskin:appleskin-forge:${appleskin_version}"
+    modCompileOnly "maven.modrinth:emi:${emi_version}+forge"
+    modRuntimeOnly "maven.modrinth:emi:${emi_version}+forge"
 
     mixinExtrasDev "io.github.llamalad7:mixinextras-forge:0.4.1"
 }
