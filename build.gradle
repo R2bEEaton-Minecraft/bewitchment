@@ -61,6 +61,10 @@ tasks.named('processResources', ProcessResources).configure {
             loader_version_range: project.loader_version_range
     ]
     inputs.properties properties
+    // The native bootstrap does not yet register the legacy Fabric items or
+    // custom recipe serializers. Do not expose their datapack files until the
+    // corresponding Forge registries have been migrated.
+    exclude 'data/**'
     filesMatching('META-INF/mods.toml') { expand properties }
 }
 
