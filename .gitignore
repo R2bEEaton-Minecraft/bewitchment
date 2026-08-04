@@ -4,6 +4,8 @@
 .gradle-forge-port/
 build/
 build-forge-port/
+run-forge-port/
+run-native-forge-port/
 out/
 classes/
 

@@ -33,24 +33,19 @@ loom {
             client()
             setConfigName("Forge Client")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("run-native-forge-port")
         }
         server {
             server()
             setConfigName("Forge Server")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("run-native-forge-port")
         }
     }
 }
 
 sourceSets.main.java.exclude('moriyashiine/bewitchment/client/integration/emi/**')
 sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
-
-configurations {
-    connectorRuntime
-    forgifiedFabricApiRuntime
-}
 
 repositories {
     maven { url "https://maven.su5ed.dev/releases" }
@@ -71,11 +66,9 @@ dependencies {
     mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
     forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // Fabric API implemented on Forge.  This allows the common code to retain
-    // Fabric API calls while producing a regular Forge mod JAR.
+    // Temporary compile-only bridge while the remaining Fabric events are
+    // migrated. It is intentionally never placed in a Forge runtime.
     modCompileOnly "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
-    forgifiedFabricApiRuntime "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
-    connectorRuntime "maven.modrinth:u58R1TMW:XoBmts8o"
 
     // API-only dependencies retained for source compatibility.  Their Forge
     // counterparts (or Connector Extras where applicable) are required at run time.
@@ -96,20 +89,6 @@ processResources {
                 "minecraft_version_range": project.minecraft_version_range,
                 "forgified_fabric_api_version": project.forgified_fabric_api_version
     }
-}
-
-tasks.register('installConnectorForDev', Copy) {
-    from configurations.connectorRuntime
-    from configurations.forgifiedFabricApiRuntime
-    into 'run/mods'
-}
-
-tasks.named('runClient').configure {
-    dependsOn tasks.named('installConnectorForDev')
-}
-
-tasks.named('runServer').configure {
-    dependsOn tasks.named('installConnectorForDev')
 }
 
 tasks.withType(JavaCompile).configureEach {

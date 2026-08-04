@@ -17,8 +17,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public final class BewitchmentForge {
 
     public BewitchmentForge() {
-        new Bewitchment().onInitialize();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> new BewitchmentClient().onInitializeClient());
+        // The legacy Fabric initializer is being migrated event-by-event. Do
+        // not load it on Forge: its Fabric API linkage is intentionally
+        // compile-only and must not be present in a native Forge installation.
     }
 }
 
