@@ -34,7 +34,6 @@ import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.block.entity.BWChestBlockEntity;
 import moriyashiine.bewitchment.common.item.TaglockItem;
 import moriyashiine.bewitchment.common.registry.*;
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -60,7 +59,7 @@ import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public class BewitchmentClient implements ClientModInitializer {
+public class BewitchmentClient {
 	public static final KeyBinding TRANSFORMATION_ABILITY = KeyBindingHelper.registerKeyBinding(new KeyBinding("key." + Bewitchment.MOD_ID + ".transformation_ability", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "itemGroup." + Bewitchment.MOD_ID));
 
 	public static final EntityModelLayer CONTRIBUTOR_HORNS_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("contributor_horns"), "main");
@@ -86,7 +85,6 @@ public class BewitchmentClient implements ClientModInitializer {
 	public static final EntityModelLayer LILITH_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("lilith"), "main");
 	public static final EntityModelLayer HERNE_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("herne"), "main");
 
-	@Override
 	public void onInitializeClient() {
 		ClientPlayNetworking.registerGlobalReceiver(SyncContractsPacket.ID, new SyncContractsPacket.Receiver());
 		ClientPlayNetworking.registerGlobalReceiver(SyncDemonTradesPacket.ID, new SyncDemonTradesPacket.Receiver());

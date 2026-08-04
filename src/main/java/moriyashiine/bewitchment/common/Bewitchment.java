@@ -20,7 +20,6 @@ import moriyashiine.bewitchment.common.recipe.AthameDropRecipe;
 import moriyashiine.bewitchment.common.recipe.IncenseRecipe;
 import moriyashiine.bewitchment.common.registry.*;
 import moriyashiine.bewitchment.common.world.BWWorldState;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -54,11 +53,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-public class Bewitchment implements ModInitializer {
+public class Bewitchment {
 	public static final String MOD_ID = "bewitchment";
 
 	@SuppressWarnings("ConstantConditions")
-	@Override
 	public void onInitialize() {
 		ServerPlayNetworking.registerGlobalReceiver(CauldronTeleportPacket.ID, new CauldronTeleportPacket.Receiver());
 		ServerPlayNetworking.registerGlobalReceiver(TransformationAbilityPacket.ID, new TransformationAbilityPacket.Receiver());
