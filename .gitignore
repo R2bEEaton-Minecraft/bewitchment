@@ -1,6 +1,7 @@
 # gradle
 
 .gradle/
+.gradle-forge-port/
 build/
 out/
 classes/

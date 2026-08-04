@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="All Rights Reserved"
+
+[[mods]]
+modId="bewitchment"
+version="${version}"
+displayName="Bewitchment"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/bewitchment"
+logoFile="assets/bewitchment/icon.png"
+authors="MoriyaShiine, cybercat5555"
+description='''A mod that aims to add witchcraft.'''
+
+[[dependencies.bewitchment]]
+modId="forge"
+mandatory=true
+versionRange="${forge_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.bewitchment]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.bewitchment]]
+modId="fabric_api"
+mandatory=true
+versionRange="[${forgified_fabric_api_version},)"
+ordering="NONE"
+side="BOTH"
