@@ -1,0 +1,12 @@
+{
+  "sources": [
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/juniper" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/cypress" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/elder" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/dragons_blood" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/hanging/juniper" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/hanging/cypress" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/hanging/elder" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/signs/hanging/dragons_blood" }
+  ]
+}

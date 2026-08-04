@@ -1,0 +1,28 @@
+{
+  "sources": [
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/juniper" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_juniper" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/juniper_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_juniper_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/juniper_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_juniper_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/cypress" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_cypress" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/cypress_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_cypress_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/cypress_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_cypress_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/elder" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_elder" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/elder_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_elder_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/elder_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_elder_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/dragons_blood" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_dragons_blood" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/dragons_blood_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_dragons_blood_left" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/dragons_blood_right" },
+    { "type": "minecraft:single", "resource": "bewitchment:entity/chest/trapped_dragons_blood_right" }
+  ]
+}

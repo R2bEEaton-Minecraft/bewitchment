@@ -6,6 +6,8 @@ package moriyashiine.bewitchment.common.registry;
 
 import moriyashiine.bewitchment.api.entity.BroomEntity;
 import moriyashiine.bewitchment.common.Bewitchment;
+import moriyashiine.bewitchment.common.entity.BWBoatEntity;
+import moriyashiine.bewitchment.common.entity.BWChestBoatEntity;
 import moriyashiine.bewitchment.common.entity.DragonsBloodBroomEntity;
 import moriyashiine.bewitchment.common.entity.ElderBroomEntity;
 import moriyashiine.bewitchment.common.entity.JuniperBroomEntity;
@@ -30,6 +32,16 @@ public class BWEntityTypes {
 	public static final EntityType<BroomEntity> CYPRESS_BROOM = create("cypress_broom", builder(BroomEntity::new, SpawnGroup.MISC, JUNIPER_BROOM.getDimensions()).build(Bewitchment.id("cypress_broom").toString()));
 	public static final EntityType<ElderBroomEntity> ELDER_BROOM = create("elder_broom", builder(ElderBroomEntity::new, SpawnGroup.MISC, JUNIPER_BROOM.getDimensions()).build(Bewitchment.id("elder_broom").toString()));
 	public static final EntityType<DragonsBloodBroomEntity> DRAGONS_BLOOD_BROOM = create("dragons_blood_broom", builder(DragonsBloodBroomEntity::new, SpawnGroup.MISC, JUNIPER_BROOM.getDimensions()).build(Bewitchment.id("dragons_blood_broom").toString()));
+
+	public static final EntityType<BWBoatEntity> JUNIPER_BOAT = boat("juniper_boat");
+	public static final EntityType<BWBoatEntity> CYPRESS_BOAT = boat("cypress_boat");
+	public static final EntityType<BWBoatEntity> ELDER_BOAT = boat("elder_boat");
+	public static final EntityType<BWBoatEntity> DRAGONS_BLOOD_BOAT = boat("dragons_blood_boat");
+
+	public static final EntityType<BWChestBoatEntity> JUNIPER_CHEST_BOAT = chestBoat("juniper_chest_boat");
+	public static final EntityType<BWChestBoatEntity> CYPRESS_CHEST_BOAT = chestBoat("cypress_chest_boat");
+	public static final EntityType<BWChestBoatEntity> ELDER_CHEST_BOAT = chestBoat("elder_chest_boat");
+	public static final EntityType<BWChestBoatEntity> DRAGONS_BLOOD_CHEST_BOAT = chestBoat("dragons_blood_chest_boat");
 
 	public static final EntityType<SilverArrowEntity> SILVER_ARROW = create("silver_arrow", BWEntityTypes.<SilverArrowEntity>builder(SilverArrowEntity::new, SpawnGroup.MISC, EntityType.ARROW.getDimensions()).build(Bewitchment.id("silver_arrow").toString()));
 	public static final EntityType<HornedSpearEntity> HORNED_SPEAR = create("horned_spear", BWEntityTypes.<HornedSpearEntity>builder(HornedSpearEntity::new, SpawnGroup.MISC, EntityType.TRIDENT.getDimensions()).build(Bewitchment.id("horned_spear").toString()));
@@ -57,6 +69,14 @@ public class BWEntityTypes {
 
 	private static <T extends Entity> EntityType.Builder<T> builder(EntityType.EntityFactory<T> factory, SpawnGroup group, EntityDimensions dimensions) {
 		return EntityType.Builder.create(factory, group).setDimensions(dimensions.width, dimensions.height);
+	}
+
+	private static EntityType<BWBoatEntity> boat(String name) {
+		return create(name, EntityType.Builder.<BWBoatEntity>create(BWBoatEntity::new, SpawnGroup.MISC).setDimensions(1.375f, 0.5625f).maxTrackingRange(10).build(Bewitchment.id(name).toString()));
+	}
+
+	private static EntityType<BWChestBoatEntity> chestBoat(String name) {
+		return create(name, EntityType.Builder.<BWChestBoatEntity>create(BWChestBoatEntity::new, SpawnGroup.MISC).setDimensions(1.375f, 0.5625f).maxTrackingRange(10).build(Bewitchment.id(name).toString()));
 	}
 
 	private static <T extends Entity> EntityType.Builder<T> mob(EntityType.EntityFactory<T> factory, SpawnGroup group, EntityDimensions dimensions, boolean fireImmune) {

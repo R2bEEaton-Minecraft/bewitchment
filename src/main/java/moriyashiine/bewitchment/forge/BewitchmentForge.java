@@ -22,6 +22,8 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.RegisterEvent;
+import net.minecraft.client.render.entity.model.BoatEntityModel;
+import net.minecraft.client.render.entity.model.ChestBoatEntityModel;
 import net.minecraft.registry.RegistryKeys;
 
 /** Forge entrypoint which delegates to the existing shared initializers. */
@@ -124,6 +126,13 @@ final class BewitchmentForgeClientModEvents {
 	}
 
 	public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+		// Sign layers need no registration here: vanilla builds them for every
+		// registered WoodType, which by now includes Bewitchment's.  Boat layers
+		// are keyed off the closed BoatEntity.Type enum, so they do.
+		for (String wood : BewitchmentClient.WOODS) {
+			event.registerLayerDefinition(BewitchmentClient.boatModelLayer(wood, false), BoatEntityModel::getTexturedModelData);
+			event.registerLayerDefinition(BewitchmentClient.boatModelLayer(wood, true), ChestBoatEntityModel::getTexturedModelData);
+		}
 		event.registerLayerDefinition(BewitchmentClient.CONTRIBUTOR_HORNS_MODEL_LAYER, ContributorHornsModel::getTexturedModelData);
 		event.registerLayerDefinition(BewitchmentClient.WITCH_ARMOR_MODEL_LAYER, WitchArmorModel::getTexturedModelData);
 		event.registerLayerDefinition(BewitchmentClient.SPECTER_BANGLE_MODEL_LAYER, SpecterBangleModel::getTexturedModelData);

@@ -4,8 +4,6 @@
 
 package moriyashiine.bewitchment.client;
 
-import com.terraformersmc.terraform.boat.api.client.TerraformBoatClientHelper;
-import com.terraformersmc.terraform.sign.SpriteIdentifierRegistry;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import moriyashiine.bewitchment.api.client.model.BroomEntityModel;
 import moriyashiine.bewitchment.client.event.CauldronTeleportEvent;
@@ -43,6 +41,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.WoodType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -54,7 +53,9 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
@@ -68,6 +69,9 @@ public class BewitchmentClient {
 	public static final EntityModelLayer PRICKLY_BELT_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("prickly_belt"), "main");
 	public static final EntityModelLayer DRUID_BAND_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("druid_band"), "main");
 	public static final EntityModelLayer ZEPHYR_HARNESS_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("zephyr_harness"), "main");
+
+	/** The woods Bewitchment carves boats and signs from. */
+	public static final String[] WOODS = {"juniper", "cypress", "elder", "dragons_blood"};
 
 	public static final EntityModelLayer BROOM_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("broom"), "main");
 	public static final EntityModelLayer OWL_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("owl"), "main");
@@ -120,10 +124,19 @@ public class BewitchmentClient {
 		BlockEntityRendererFactories.register(BWBlockEntityTypes.JUNIPER_CHEST, ChestBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(BWBlockEntityTypes.ELDER_CHEST, ChestBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(BWBlockEntityTypes.DRAGONS_BLOOD_CHEST, ChestBlockEntityRenderer::new);
-		TerraformBoatClientHelper.registerModelLayers(Bewitchment.id("juniper_boat"), false);
-		TerraformBoatClientHelper.registerModelLayers(Bewitchment.id("cypress_boat"), false);
-		TerraformBoatClientHelper.registerModelLayers(Bewitchment.id("elder_boat"), false);
-		TerraformBoatClientHelper.registerModelLayers(Bewitchment.id("dragons_blood_boat"), false);
+		// Vanilla's sign renderers and atlas maps are built from the registered
+		// wood types; make sure Bewitchment's are present in both.
+		for (WoodType woodType : BWWoodTypes.VALUES) {
+			TexturedRenderLayers.addWoodType(woodType);
+		}
+		registerBoatRenderer(BWEntityTypes.JUNIPER_BOAT, "juniper", false);
+		registerBoatRenderer(BWEntityTypes.CYPRESS_BOAT, "cypress", false);
+		registerBoatRenderer(BWEntityTypes.ELDER_BOAT, "elder", false);
+		registerBoatRenderer(BWEntityTypes.DRAGONS_BLOOD_BOAT, "dragons_blood", false);
+		registerBoatRenderer(BWEntityTypes.JUNIPER_CHEST_BOAT, "juniper", true);
+		registerBoatRenderer(BWEntityTypes.CYPRESS_CHEST_BOAT, "cypress", true);
+		registerBoatRenderer(BWEntityTypes.ELDER_CHEST_BOAT, "elder", true);
+		registerBoatRenderer(BWEntityTypes.DRAGONS_BLOOD_CHEST_BOAT, "dragons_blood", true);
 		EntityModelLayerRegistry.registerModelLayer(CONTRIBUTOR_HORNS_MODEL_LAYER, ContributorHornsModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(WITCH_ARMOR_MODEL_LAYER, WitchArmorModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(SPECTER_BANGLE_MODEL_LAYER, SpecterBangleModel::getTexturedModelData);
@@ -184,38 +197,9 @@ public class BewitchmentClient {
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), BWObjects.BRAZIER);
 		HandledScreens.register(BWScreenHandlerTypes.DEMON_SCREEN_HANDLER, DemonScreen::new);
 		HandledScreens.register(BWScreenHandlerTypes.BAPHOMET_SCREEN_HANDLER, DemonScreen::new);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.JUNIPER_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_JUNIPER_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.JUNIPER_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_JUNIPER_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.JUNIPER_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_JUNIPER_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.CYPRESS_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_CYPRESS_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.CYPRESS_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_CYPRESS_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.CYPRESS_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_CYPRESS_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.ELDER_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_ELDER_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.ELDER_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_ELDER_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.ELDER_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_ELDER_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.DRAGONS_BLOOD_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_DRAGONS_BLOOD_CHEST);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.DRAGONS_BLOOD_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_DRAGONS_BLOOD_CHEST_LEFT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.DRAGONS_BLOOD_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(SpriteIdentifiers.TRAPPED_DRAGONS_BLOOD_CHEST_RIGHT);
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.JUNIPER_SIGN.getLeft()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.JUNIPER_SIGN.getRight()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.CYPRESS_SIGN.getLeft()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.CYPRESS_SIGN.getRight()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.ELDER_SIGN.getLeft()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.ELDER_SIGN.getRight()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.DRAGONS_BLOOD_SIGN.getLeft()));
-		SpriteIdentifierRegistry.INSTANCE.addIdentifier(new SpriteIdentifier(TexturedRenderLayers.SIGNS_ATLAS_TEXTURE, BWObjects.DRAGONS_BLOOD_SIGN.getRight()));
+		// Bewitchment's chest and sign sprites are stitched onto the vanilla chest
+		// and sign atlases by assets/minecraft/atlases/{chest,signs}.json, which
+		// Minecraft merges across resource packs.
 		BuiltinItemRendererRegistry.INSTANCE.register(BWObjects.JUNIPER_CHEST, (stack, mode, matrices, vertexConsumers, light, overlay) -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(new BWChestBlockEntity(BWBlockEntityTypes.BW_CHEST, BlockPos.ORIGIN, BWObjects.JUNIPER_CHEST.getDefaultState(), BWChestBlockEntity.Type.JUNIPER, false), matrices, vertexConsumers, light, overlay));
 		BuiltinItemRendererRegistry.INSTANCE.register(BWObjects.TRAPPED_JUNIPER_CHEST, (stack, mode, matrices, vertexConsumers, light, overlay) -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(new BWChestBlockEntity(BWBlockEntityTypes.BW_CHEST, BlockPos.ORIGIN, BWObjects.TRAPPED_JUNIPER_CHEST.getDefaultState(), BWChestBlockEntity.Type.JUNIPER, true), matrices, vertexConsumers, light, overlay));
 		BuiltinItemRendererRegistry.INSTANCE.register(BWObjects.CYPRESS_CHEST, (stack, mode, matrices, vertexConsumers, light, overlay) -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(new BWChestBlockEntity(BWBlockEntityTypes.BW_CHEST, BlockPos.ORIGIN, BWObjects.CYPRESS_CHEST.getDefaultState(), BWChestBlockEntity.Type.CYPRESS, false), matrices, vertexConsumers, light, overlay));
@@ -238,5 +222,17 @@ public class BewitchmentClient {
 
 	public static ModelPart getPart(EntityModelLayer layer) {
 		return MinecraftClient.getInstance().getEntityModelLoader().getModelPart(layer);
+	}
+
+	public static EntityModelLayer boatModelLayer(String wood, boolean chest) {
+		return new EntityModelLayer(Bewitchment.id((chest ? "chest_boat/" : "boat/") + wood), "main");
+	}
+
+	public static Identifier boatTexture(String wood, boolean chest) {
+		return Bewitchment.id("textures/entity/" + (chest ? "chest_boat/" : "boat/") + wood + "_boat.png");
+	}
+
+	private static void registerBoatRenderer(EntityType<? extends BoatEntity> type, String wood, boolean chest) {
+		EntityRendererRegistry.register(type, ctx -> new BWBoatEntityRenderer(ctx, boatModelLayer(wood, chest), boatTexture(wood, chest), chest));
 	}
 }
