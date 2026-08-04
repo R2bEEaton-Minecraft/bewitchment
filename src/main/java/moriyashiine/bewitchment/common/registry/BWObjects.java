@@ -48,6 +48,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.RegisterEvent;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -101,6 +102,7 @@ public class BWObjects {
 	public static final Item JUNIPER_DOOR_ITEM = create("juniper_door", new TallBlockItem(JUNIPER_DOOR, gen()));
 	public static final Block JUNIPER_CHEST = create("juniper_chest", new JuniperChestBlock(copyOf(Blocks.CHEST), () -> BWBlockEntityTypes.JUNIPER_CHEST, false), true);
 	public static final Block TRAPPED_JUNIPER_CHEST = create("trapped_juniper_chest", new JuniperChestBlock(copyOf(Blocks.CHEST), () -> BWBlockEntityTypes.JUNIPER_CHEST, true), true);
+	public static final Item JUNIPER_BOAT = createBoat("juniper");
 	public static final Pair<Identifier, Identifier> JUNIPER_SIGN = createSign("juniper");
 	//cypress
 	public static final Block CYPRESS_LOG = create("cypress_log", new PillarBlock(copyOf(JUNIPER_LOG)), true);
@@ -122,6 +124,7 @@ public class BWObjects {
 	public static final Item CYPRESS_DOOR_ITEM = create("cypress_door", new TallBlockItem(CYPRESS_DOOR, gen()));
 	public static final Block CYPRESS_CHEST = create("cypress_chest", new BWChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.BW_CHEST, false), true);
 	public static final Block TRAPPED_CYPRESS_CHEST = create("trapped_cypress_chest", new BWChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.BW_CHEST, true), true);
+	public static final Item CYPRESS_BOAT = createBoat("cypress");
 	public static final Pair<Identifier, Identifier> CYPRESS_SIGN = createSign("cypress");
 	//elder
 	public static final Block ELDER_LOG = create("elder_log", new PillarBlock(copyOf(JUNIPER_LOG)), true);
@@ -143,6 +146,7 @@ public class BWObjects {
 	public static final Item ELDER_DOOR_ITEM = create("elder_door", new TallBlockItem(ELDER_DOOR, gen()));
 	public static final Block ELDER_CHEST = create("elder_chest", new ElderChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.ELDER_CHEST, false), true);
 	public static final Block TRAPPED_ELDER_CHEST = create("trapped_elder_chest", new ElderChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.ELDER_CHEST, true), true);
+	public static final Item ELDER_BOAT = createBoat("elder");
 	public static final Pair<Identifier, Identifier> ELDER_SIGN = createSign("elder");
 	//dragons_blood
 	public static final Block DRAGONS_BLOOD_LOG = create("dragons_blood_log", new DragonsBloodLogBlock(copyOf(JUNIPER_LOG).ticksRandomly()), true);
@@ -164,6 +168,7 @@ public class BWObjects {
 	public static final Item DRAGONS_BLOOD_DOOR_ITEM = create("dragons_blood_door", new TallBlockItem(DRAGONS_BLOOD_DOOR, gen()));
 	public static final Block DRAGONS_BLOOD_CHEST = create("dragons_blood_chest", new DragonsBloodChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.DRAGONS_BLOOD_CHEST, false), true);
 	public static final Block TRAPPED_DRAGONS_BLOOD_CHEST = create("trapped_dragons_blood_chest", new DragonsBloodChestBlock(copyOf(JUNIPER_CHEST), () -> BWBlockEntityTypes.DRAGONS_BLOOD_CHEST, true), true);
+	public static final Item DRAGONS_BLOOD_BOAT = createBoat("dragons_blood");
 	public static final Pair<Identifier, Identifier> DRAGONS_BLOOD_SIGN = createSign("dragons_blood");
 	//other_plants
 	public static final Block GLOWING_BRAMBLE = create("glowing_bramble", new BrambleBlock(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS).strength(2, 3).noCollision().ticksRandomly().luminance(state -> 15)), true);
@@ -383,7 +388,20 @@ public class BWObjects {
 	}
 
 	private static Pair<Identifier, Identifier> createSign(String name) {
+		// Forge's 1.20.1 sign block registration is type-coupled and cannot use
+		// Fabric's runtime WoodType extension.  Keep the public item IDs present
+		// while the native sign block/entity implementation is migrated.
+		create(name + "_sign", new Item(gen().maxCount(16)));
+		create(name + "_hanging_sign", new Item(gen().maxCount(16)));
 		return new Pair<>(Bewitchment.id("entity/signs/" + name), Bewitchment.id("entity/signs/hanging/" + name));
+	}
+
+	private static Item createBoat(String name) {
+		Item boat = create(name + "_boat", new BoatItem(false, net.minecraft.entity.vehicle.BoatEntity.Type.OAK, gen()));
+		Item chestBoat = create(name + "_chest_boat", new BoatItem(true, net.minecraft.entity.vehicle.BoatEntity.Type.OAK, gen()));
+		BOATS.add(boat);
+		BOATS.add(chestBoat);
+		return boat;
 	}
 
 	private static Block[] createAltar(String name, AbstractBlock.Settings settings) {
@@ -402,6 +420,23 @@ public class BWObjects {
 	}
 
 	public static void init() {
+		registerStrippables();
+		registerFlammables();
+		registerCompostables();
+	}
+
+	/** Called from Forge's block registry event, before that registry freezes. */
+	public static void registerBlocks(RegisterEvent event) {
+		BLOCKS.forEach((block, id) -> event.register(net.minecraft.registry.RegistryKeys.BLOCK, id, () -> block));
+	}
+
+	/** Called from Forge's item registry event, before that registry freezes. */
+	public static void registerItems(RegisterEvent event) {
+		ITEMS.forEach((item, id) -> event.register(net.minecraft.registry.RegistryKeys.ITEM, id, () -> item));
+	}
+
+	/** Called from Forge's creative-tab registry event. */
+	public static void registerItemGroup(RegisterEvent event) {
 		GROUP = ItemGroup.builder().displayName(Text.translatable("itemGroup." + Bewitchment.MOD_ID)).icon(ATHAME::getDefaultStack).entries((displayContext, entries) -> {
 			ITEMS.keySet().forEach(item -> {
 				if (item instanceof ContractItem) {
@@ -417,12 +452,7 @@ public class BWObjects {
 			});
 			BOATS.forEach(entries::add);
 		}).build();
-		Registry.register(Registries.ITEM_GROUP, Bewitchment.id(Bewitchment.MOD_ID), GROUP);
-		BLOCKS.keySet().forEach(block -> Registry.register(Registries.BLOCK, BLOCKS.get(block), block));
-		ITEMS.keySet().forEach(item -> Registry.register(Registries.ITEM, ITEMS.get(item), item));
-		registerStrippables();
-		registerFlammables();
-		registerCompostables();
+		event.register(net.minecraft.registry.RegistryKeys.ITEM_GROUP, Bewitchment.id(Bewitchment.MOD_ID), () -> GROUP);
 	}
 
 	public static int getFuelBurnTime(ItemStack stack) {
