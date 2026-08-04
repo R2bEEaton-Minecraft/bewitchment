@@ -10,6 +10,7 @@ import moriyashiine.bewitchment.api.component.TransformationComponent;
 import moriyashiine.bewitchment.client.packet.SpawnSmokeParticlesPacket;
 import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.registry.*;
+import moriyashiine.bewitchment.forge.BewitchmentForgeTransformationEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -51,19 +52,16 @@ public class TransformationAbilityPacket {
 				SpawnSmokeParticlesPacket.send((ServerPlayerEntity) player, player);
 				world.playSound(null, player.getBlockPos(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, player.getSoundCategory(), 1, 1);
 				transformationComponent.setAlternateForm(!isAlternateForm);
-				if (isAlternateForm) {
-				} else {
-				}
+				BewitchmentForgeTransformationEvents.setVampireFlight(player, !isAlternateForm);
+				player.calculateDimensions();
 			} else if (transformationComponent.getTransformation() == BWTransformations.WEREWOLF && (forced || BewitchmentAPI.isPledged(player, BWPledges.HERNE))) {
 				PlayerLookup.tracking(player).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, player));
 				SpawnSmokeParticlesPacket.send((ServerPlayerEntity) player, player);
 				world.playSound(null, player.getBlockPos(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, player.getSoundCategory(), 1, 1);
 				transformationComponent.setAlternateForm(!isAlternateForm);
-				if (isAlternateForm) {
-					if (player.hasStatusEffect(StatusEffects.NIGHT_VISION) && player.getStatusEffect(StatusEffects.NIGHT_VISION).isAmbient()) {
-						player.removeStatusEffect(StatusEffects.NIGHT_VISION);
-					}
-				} else {
+				player.calculateDimensions();
+				if (isAlternateForm && player.hasStatusEffect(StatusEffects.NIGHT_VISION) && player.getStatusEffect(StatusEffects.NIGHT_VISION).isAmbient()) {
+					player.removeStatusEffect(StatusEffects.NIGHT_VISION);
 				}
 			}
 		});

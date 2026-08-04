@@ -58,6 +58,7 @@ public final class BewitchmentForge {
         MinecraftForge.EVENT_BUS.addListener(BWComponentEvents::syncOnJoin);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeModEvents::registerFuelBurnTimes);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeGameplayEvents::applyVoodooDrowning);
+        MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeTransformationEvents::resizeTransformedPlayers);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modBus.addListener(BewitchmentForgeClientModEvents::clientSetup);
             modBus.addListener(BewitchmentForgeClientModEvents::registerLayerDefinitions);

@@ -100,10 +100,21 @@ public final class BWEntityComponents {
 		}
 		// Each send consumes its buffer, so every recipient needs its own.
 		for (ServerPlayerEntity player : PlayerLookup.tracking(entity)) {
-			ServerPlayNetworking.send(player, SYNC_PACKET_ID, packet(entity, key, component));
+			send(player, entity, key, component);
 		}
 		if (entity instanceof ServerPlayerEntity self) {
-			ServerPlayNetworking.send(self, SYNC_PACKET_ID, packet(entity, key, component));
+			send(self, entity, key, component);
+		}
+	}
+
+	/**
+	 * Components synchronize themselves from their setters, and those setters run
+	 * while a player's saved data is being read, which happens before the player
+	 * has a connection to send down.
+	 */
+	private static void send(ServerPlayerEntity target, Entity entity, ComponentKey<?> key, Component component) {
+		if (target.networkHandler != null) {
+			ServerPlayNetworking.send(target, SYNC_PACKET_ID, packet(entity, key, component));
 		}
 	}
 
@@ -115,7 +126,7 @@ public final class BWEntityComponents {
 		}
 		holder.components.forEach((key, component) -> {
 			if (component instanceof AutoSyncedComponent) {
-				ServerPlayNetworking.send(target, SYNC_PACKET_ID, packet(entity, key, component));
+				send(target, entity, key, component);
 			}
 		});
 	}

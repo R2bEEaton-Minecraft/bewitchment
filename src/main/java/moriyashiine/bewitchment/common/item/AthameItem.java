@@ -28,7 +28,6 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -45,6 +44,7 @@ import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraft.world.World;
 
 import java.util.UUID;
@@ -136,7 +136,7 @@ public class AthameItem extends SwordItem {
 	public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
 		Multimap<EntityAttribute, EntityAttributeModifier> map = LinkedHashMultimap.create(super.getAttributeModifiers(slot));
 		if (slot == EquipmentSlot.MAINHAND) {
-			map.put(EntityAttributes.GENERIC_LUCK, REACH_MODIFIER);
+			map.put(ForgeMod.ENTITY_REACH.get(), REACH_MODIFIER);
 		}
 		return map;
 	}

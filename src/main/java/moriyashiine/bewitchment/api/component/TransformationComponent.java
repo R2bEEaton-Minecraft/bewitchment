@@ -27,6 +27,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.common.ForgeMod;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -182,9 +183,9 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 		EntityAttributeInstance armorAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_ARMOR);
 		EntityAttributeInstance armorToughnessAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
 		EntityAttributeInstance movementSpeedAttribute = obj.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-		EntityAttributeInstance attackRange = obj.getAttributeInstance(EntityAttributes.GENERIC_LUCK);
-		EntityAttributeInstance reach = obj.getAttributeInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE);
-		EntityAttributeInstance stepHeight = obj.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+		EntityAttributeInstance attackRange = obj.getAttributeInstance(ForgeMod.ENTITY_REACH.get());
+		EntityAttributeInstance reach = obj.getAttributeInstance(ForgeMod.BLOCK_REACH.get());
+		EntityAttributeInstance stepHeight = obj.getAttributeInstance(ForgeMod.STEP_HEIGHT_ADDITION.get());
 		boolean shouldHave = vampire && !BewitchmentAPI.isPledged(obj, BWPledges.LILITH);
 		if (shouldHave && !attackDamageAttribute.hasModifier(VAMPIRE_ATTACK_DAMAGE_MODIFIER_0)) {
 			attackDamageAttribute.addPersistentModifier(VAMPIRE_ATTACK_DAMAGE_MODIFIER_0);

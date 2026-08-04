@@ -15,7 +15,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
@@ -27,6 +26,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraft.world.World;
 
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class HornedSpearItem extends SwordItem {
 	public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
 		Multimap<EntityAttribute, EntityAttributeModifier> map = LinkedHashMultimap.create(super.getAttributeModifiers(slot));
 		if (slot == EquipmentSlot.MAINHAND) {
-			map.put(EntityAttributes.GENERIC_LUCK, REACH_MODIFIER);
+			map.put(ForgeMod.ENTITY_REACH.get(), REACH_MODIFIER);
 		}
 		return map;
 	}
