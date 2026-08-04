@@ -1,6 +1,8 @@
 plugins {
-    id 'dev.architectury.loom' version '1.7-SNAPSHOT'
+    id 'eclipse'
+    id 'idea'
     id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
 version = project.mod_version
@@ -10,85 +12,56 @@ base {
     archivesName = "${project.archives_base_name}-forge-${project.minecraft_version}"
 }
 
-// Lets the porting run use an isolated remap cache while an IDE has the
-// standard build directory open for source indexing.
-if (project.hasProperty('portBuildDir')) {
-    buildDir = file(project.property('portBuildDir'))
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-loom {
-    accessWidenerPath = file("src/main/resources/bewitchment.accesswidener")
-
-    forge {
-        mixinConfig "bewitchment.mixins.json"
-        convertAccessWideners = true
-    }
-
-    mixin {
-        defaultRefmapName.set("bewitchment.refmap.json")
-    }
-
+minecraft {
+    mappings channel: 'official', version: project.minecraft_version
+    copyIdeResources = true
     runs {
-        client {
-            client()
-            setConfigName("Forge Client")
-            ideConfigGenerated(true)
-            runDir("run-native-forge-port")
+        configureEach {
+            workingDirectory project.file('run-native-forge-port')
+            property 'forge.logging.console.level', 'info'
+            mods {
+                "${project.mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
-        server {
-            server()
-            setConfigName("Forge Server")
-            ideConfigGenerated(true)
-            runDir("run-native-forge-port")
-        }
+        client {}
+        server { args '--nogui' }
     }
 }
 
-sourceSets.main.java.exclude('moriyashiine/bewitchment/client/integration/emi/**')
-sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
+sourceSets {
+    main {
+        java {
+            // The original mod is Yarn/Fabric source. It stays in the tree for
+            // incremental migration but is not valid ForgeGradle input yet.
+            setSrcDirs(['src/forge/java'])
+        }
+        resources {
+            setSrcDirs(['src/main/resources'])
+        }
+    }
+}
 
 repositories {
-    maven { url "https://maven.su5ed.dev/releases" }
-    maven { url "https://maven.ladysnake.org/releases" }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "https://maven.jamieswhiteshirt.com/libs-release" }
-    maven { url "https://maven.terraformersmc.com" }
-    maven { url "https://maven.blamejared.com" }
-    maven { url "https://maven.ryanliptak.com" }
-    maven { url "https://maven.theillusivec4.top/" }
-    maven { url "https://maven.shedaniel.me" }
-    maven { url "https://api.modrinth.com/maven" }
-    maven { url "https://jitpack.io" }
+    maven { url 'https://maven.minecraftforge.net/' }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    // Temporary compile-only bridge while the remaining Fabric events are
-    // migrated. It is intentionally never placed in a Forge runtime.
-    modCompileOnly "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
-
-    // API-only dependencies retained for source compatibility.  Their Forge
-    // counterparts (or Connector Extras where applicable) are required at run time.
-    modImplementation "vazkii.patchouli:Patchouli:${patchouli_version}"
-    modImplementation "top.theillusivec4.curios:curios-forge:${curios_version}"
-    modImplementation "squeek.appleskin:appleskin-forge:${appleskin_version}"
+    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 }
 
-processResources {
-	// Forge loads META-INF/mods.toml. Leaving the Fabric descriptor on the
-	// development classpath makes Connector discover this project twice.
-	exclude "fabric.mod.json"
-    inputs.property "version", project.version
-    filesMatching("META-INF/mods.toml") {
-        expand "version": project.version,
-                "forge_version_range": project.forge_version_range,
-                "loader_version_range": project.loader_version_range,
-                "minecraft_version_range": project.minecraft_version_range,
-                "forgified_fabric_api_version": project.forgified_fabric_api_version
-    }
+tasks.named('processResources', ProcessResources).configure {
+    def properties = [
+            version: project.version,
+            minecraft_version_range: project.minecraft_version_range,
+            forge_version_range: project.forge_version_range,
+            loader_version_range: project.loader_version_range
+    ]
+    inputs.properties properties
+    filesMatching('META-INF/mods.toml') { expand properties }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -96,15 +69,6 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-java {
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
-    }
+tasks.named('jar', Jar).configure {
     finalizedBy 'reobfJar'
 }
