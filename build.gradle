@@ -79,7 +79,6 @@ dependencies {
 
     // API-only dependencies retained for source compatibility.  Their Forge
     // counterparts (or Connector Extras where applicable) are required at run time.
-    modImplementation "maven.modrinth:midnightlib:${midnightlib_version}"
     modImplementation "vazkii.patchouli:Patchouli:${patchouli_version}"
     modImplementation "top.theillusivec4.curios:curios-forge:${curios_version}"
     modImplementation "squeek.appleskin:appleskin-forge:${appleskin_version}"

@@ -4,7 +4,6 @@
 
 package moriyashiine.bewitchment.common;
 
-import eu.midnightdust.lib.config.MidnightConfig;
 import moriyashiine.bewitchment.api.BewitchmentAPI;
 import moriyashiine.bewitchment.api.component.BloodComponent;
 import moriyashiine.bewitchment.api.event.BloodSuckEvents;
@@ -61,7 +60,6 @@ public class Bewitchment implements ModInitializer {
 	@SuppressWarnings("ConstantConditions")
 	@Override
 	public void onInitialize() {
-		MidnightConfig.init(MOD_ID, BWConfig.class);
 		ServerPlayNetworking.registerGlobalReceiver(CauldronTeleportPacket.ID, new CauldronTeleportPacket.Receiver());
 		ServerPlayNetworking.registerGlobalReceiver(TransformationAbilityPacket.ID, new TransformationAbilityPacket.Receiver());
 		ServerPlayNetworking.registerGlobalReceiver(TogglePressingForwardPacket.ID, new TogglePressingForwardPacket.Receiver());
