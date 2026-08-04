@@ -9,6 +9,9 @@ import moriyashiine.bewitchment.client.model.equipment.trinket.*;
 import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.entity.living.*;
 import moriyashiine.bewitchment.common.registry.*;
+import moriyashiine.bewitchment.forge.component.BWComponentEvents;
+import moriyashiine.bewitchment.forge.component.BWEntityComponents;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -31,6 +34,9 @@ import net.minecraft.registry.RegistryKeys;
 public final class BewitchmentForge {
 
     public BewitchmentForge() {
+        // Component keys must all exist before the first entity is constructed,
+        // because attaching the capability enumerates them.
+        BWComponents.init();
         new Bewitchment().onInitialize();
         // These are Bewitchment's own Fabric-backed registries, not Forge
         // registry events.  Their entries must exist before item-group search
@@ -45,6 +51,11 @@ public final class BewitchmentForge {
         modBus.addListener(BewitchmentForgeModEvents::commonSetup);
         modBus.addListener(BewitchmentForgeModEvents::registerContent);
         modBus.addListener(BewitchmentForgeModEvents::registerEntityAttributes);
+        modBus.addListener(BWEntityComponents::registerCapability);
+        MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, BWEntityComponents::attach);
+        MinecraftForge.EVENT_BUS.addListener(BWComponentEvents::copyOnRespawn);
+        MinecraftForge.EVENT_BUS.addListener(BWComponentEvents::syncOnStartTracking);
+        MinecraftForge.EVENT_BUS.addListener(BWComponentEvents::syncOnJoin);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeModEvents::registerFuelBurnTimes);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeGameplayEvents::applyVoodooDrowning);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {

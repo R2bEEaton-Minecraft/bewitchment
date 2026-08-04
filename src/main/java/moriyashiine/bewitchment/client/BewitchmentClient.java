@@ -32,6 +32,7 @@ import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.block.entity.BWChestBlockEntity;
 import moriyashiine.bewitchment.common.item.TaglockItem;
 import moriyashiine.bewitchment.common.registry.*;
+import moriyashiine.bewitchment.forge.component.BWEntityComponents;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -90,6 +91,7 @@ public class BewitchmentClient {
 	public static final EntityModelLayer HERNE_MODEL_LAYER = new EntityModelLayer(Bewitchment.id("herne"), "main");
 
 	public void onInitializeClient() {
+		ClientPlayNetworking.registerGlobalReceiver(BWEntityComponents.SYNC_PACKET_ID, new SyncComponentPacket.Receiver());
 		ClientPlayNetworking.registerGlobalReceiver(SyncContractsPacket.ID, new SyncContractsPacket.Receiver());
 		ClientPlayNetworking.registerGlobalReceiver(SyncDemonTradesPacket.ID, new SyncDemonTradesPacket.Receiver());
 		ClientPlayNetworking.registerGlobalReceiver(SyncPoppetShelfPacket.ID, new SyncPoppetShelfPacket.Receiver());
