@@ -10,6 +10,12 @@ base {
     archivesName = "${project.archives_base_name}-forge-${project.minecraft_version}"
 }
 
+// Lets the porting run use an isolated remap cache while an IDE has the
+// standard build directory open for source indexing.
+if (project.hasProperty('portBuildDir')) {
+    buildDir = file(project.property('portBuildDir'))
+}
+
 loom {
     accessWidenerPath = file("src/main/resources/bewitchment.accesswidener")
 
@@ -41,6 +47,11 @@ loom {
 sourceSets.main.java.exclude('moriyashiine/bewitchment/client/integration/emi/**')
 sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
 
+configurations {
+    connectorRuntime
+    forgifiedFabricApiRuntime
+}
+
 repositories {
     maven { url "https://maven.su5ed.dev/releases" }
     maven { url "https://maven.ladysnake.org/releases" }
@@ -62,26 +73,44 @@ dependencies {
 
     // Fabric API implemented on Forge.  This allows the common code to retain
     // Fabric API calls while producing a regular Forge mod JAR.
-    modImplementation "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
+    modCompileOnly "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
+    forgifiedFabricApiRuntime "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
+    connectorRuntime "maven.modrinth:u58R1TMW:XoBmts8o"
 
     // API-only dependencies retained for source compatibility.  Their Forge
     // counterparts (or Connector Extras where applicable) are required at run time.
     modImplementation "maven.modrinth:midnightlib:${midnightlib_version}"
-    modImplementation "com.github.emilyploszaj:step-height-entity-attribute:${step_height_entity_attribute_version}"
     modImplementation "vazkii.patchouli:Patchouli:${patchouli_version}"
     modImplementation "top.theillusivec4.curios:curios-forge:${curios_version}"
     modImplementation "squeek.appleskin:appleskin-forge:${appleskin_version}"
 }
 
 processResources {
+	// Forge loads META-INF/mods.toml. Leaving the Fabric descriptor on the
+	// development classpath makes Connector discover this project twice.
+	exclude "fabric.mod.json"
     inputs.property "version", project.version
-    filesMatching(["fabric.mod.json", "META-INF/mods.toml"]) {
+    filesMatching("META-INF/mods.toml") {
         expand "version": project.version,
                 "forge_version_range": project.forge_version_range,
                 "loader_version_range": project.loader_version_range,
                 "minecraft_version_range": project.minecraft_version_range,
                 "forgified_fabric_api_version": project.forgified_fabric_api_version
     }
+}
+
+tasks.register('installConnectorForDev', Copy) {
+    from configurations.connectorRuntime
+    from configurations.forgifiedFabricApiRuntime
+    into 'run/mods'
+}
+
+tasks.named('runClient').configure {
+    dependsOn tasks.named('installConnectorForDev')
+}
+
+tasks.named('runServer').configure {
+    dependsOn tasks.named('installConnectorForDev')
 }
 
 tasks.withType(JavaCompile).configureEach {
