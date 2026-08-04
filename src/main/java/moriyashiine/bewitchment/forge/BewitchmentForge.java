@@ -4,7 +4,9 @@ import moriyashiine.bewitchment.client.BewitchmentClient;
 import moriyashiine.bewitchment.common.Bewitchment;
 import moriyashiine.bewitchment.common.entity.living.*;
 import moriyashiine.bewitchment.common.registry.BWEntityTypes;
+import moriyashiine.bewitchment.common.registry.BWObjects;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -38,5 +40,11 @@ final class BewitchmentForgeModEvents {
         event.put(BWEntityTypes.BAPHOMET, BaphometEntity.createAttributes().build());
         event.put(BWEntityTypes.LILITH, LilithEntity.createAttributes().build());
         event.put(BWEntityTypes.HERNE, HerneEntity.createAttributes().build());
+    }
+
+    @SubscribeEvent
+    public static void registerFuelBurnTimes(FurnaceFuelBurnTimeEvent event) {
+        int burnTime = BWObjects.getFuelBurnTime(event.getItemStack());
+        if (burnTime > 0) event.setBurnTime(burnTime);
     }
 }

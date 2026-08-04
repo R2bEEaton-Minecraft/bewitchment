@@ -26,11 +26,7 @@ import moriyashiine.bewitchment.common.world.generator.tree.generator.DragonsBlo
 import moriyashiine.bewitchment.common.world.generator.tree.generator.ElderSaplingGenerator;
 import moriyashiine.bewitchment.common.world.generator.tree.generator.JuniperSaplingGenerator;
 import moriyashiine.bewitchment.mixin.BlocksAccessor;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
-import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
-import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
+import moriyashiine.bewitchment.mixin.AxeItemAccessor;
 import net.minecraft.block.*;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
@@ -406,7 +402,7 @@ public class BWObjects {
 	}
 
 	public static void init() {
-		GROUP = FabricItemGroup.builder().displayName(Text.translatable("itemGroup." + Bewitchment.MOD_ID)).icon(ATHAME::getDefaultStack).entries((displayContext, entries) -> {
+		GROUP = ItemGroup.builder().displayName(Text.translatable("itemGroup." + Bewitchment.MOD_ID)).icon(ATHAME::getDefaultStack).entries((displayContext, entries) -> {
 			ITEMS.keySet().forEach(item -> {
 				if (item instanceof ContractItem) {
 					BWRegistries.CONTRACT.forEach(contract -> {
@@ -424,94 +420,43 @@ public class BWObjects {
 		Registry.register(Registries.ITEM_GROUP, Bewitchment.id(Bewitchment.MOD_ID), GROUP);
 		BLOCKS.keySet().forEach(block -> Registry.register(Registries.BLOCK, BLOCKS.get(block), block));
 		ITEMS.keySet().forEach(item -> Registry.register(Registries.ITEM, ITEMS.get(item), item));
-		StrippableBlockRegistry.register(JUNIPER_LOG, STRIPPED_JUNIPER_LOG);
-		StrippableBlockRegistry.register(JUNIPER_WOOD, STRIPPED_JUNIPER_WOOD);
-		StrippableBlockRegistry.register(CYPRESS_LOG, STRIPPED_CYPRESS_LOG);
-		StrippableBlockRegistry.register(CYPRESS_WOOD, STRIPPED_CYPRESS_WOOD);
-		StrippableBlockRegistry.register(ELDER_LOG, STRIPPED_ELDER_LOG);
-		StrippableBlockRegistry.register(ELDER_WOOD, STRIPPED_ELDER_WOOD);
-		StrippableBlockRegistry.register(DRAGONS_BLOOD_LOG, STRIPPED_DRAGONS_BLOOD_LOG);
-		StrippableBlockRegistry.register(DRAGONS_BLOOD_WOOD, STRIPPED_DRAGONS_BLOOD_WOOD);
-		FuelRegistry fuelRegistry = FuelRegistry.INSTANCE;
-		fuelRegistry.add(JUNIPER_FENCE, 300);
-		fuelRegistry.add(JUNIPER_FENCE_GATE, 300);
-		fuelRegistry.add(CYPRESS_FENCE, 300);
-		fuelRegistry.add(CYPRESS_FENCE_GATE, 300);
-		fuelRegistry.add(ELDER_FENCE, 300);
-		fuelRegistry.add(ELDER_FENCE_GATE, 300);
-		fuelRegistry.add(DRAGONS_BLOOD_FENCE, 300);
-		fuelRegistry.add(DRAGONS_BLOOD_FENCE_GATE, 300);
-		fuelRegistry.add(BWTags.BARKS, 100);
-		fuelRegistry.add(SCORCHED_BRAMBLE, 800);
-		FlammableBlockRegistry flammableRegistry = FlammableBlockRegistry.getDefaultInstance();
-		flammableRegistry.add(STRIPPED_JUNIPER_LOG, 5, 5);
-		flammableRegistry.add(STRIPPED_JUNIPER_WOOD, 5, 5);
-		flammableRegistry.add(JUNIPER_LOG, 5, 5);
-		flammableRegistry.add(JUNIPER_WOOD, 5, 5);
-		flammableRegistry.add(JUNIPER_LEAVES, 30, 60);
-		flammableRegistry.add(JUNIPER_PLANKS, 5, 20);
-		flammableRegistry.add(JUNIPER_STAIRS, 5, 20);
-		flammableRegistry.add(JUNIPER_SLAB, 5, 20);
-		flammableRegistry.add(JUNIPER_FENCE, 5, 20);
-		flammableRegistry.add(JUNIPER_FENCE_GATE, 5, 20);
-		flammableRegistry.add(STRIPPED_CYPRESS_LOG, 5, 5);
-		flammableRegistry.add(STRIPPED_CYPRESS_WOOD, 5, 5);
-		flammableRegistry.add(CYPRESS_LOG, 5, 5);
-		flammableRegistry.add(CYPRESS_WOOD, 5, 5);
-		flammableRegistry.add(CYPRESS_LEAVES, 30, 60);
-		flammableRegistry.add(CYPRESS_PLANKS, 5, 20);
-		flammableRegistry.add(CYPRESS_STAIRS, 5, 20);
-		flammableRegistry.add(CYPRESS_SLAB, 5, 20);
-		flammableRegistry.add(CYPRESS_FENCE, 5, 20);
-		flammableRegistry.add(CYPRESS_FENCE_GATE, 5, 20);
-		flammableRegistry.add(STRIPPED_ELDER_LOG, 5, 5);
-		flammableRegistry.add(STRIPPED_ELDER_WOOD, 5, 5);
-		flammableRegistry.add(ELDER_LOG, 5, 5);
-		flammableRegistry.add(ELDER_WOOD, 5, 5);
-		flammableRegistry.add(ELDER_LEAVES, 30, 60);
-		flammableRegistry.add(ELDER_PLANKS, 5, 20);
-		flammableRegistry.add(ELDER_STAIRS, 5, 20);
-		flammableRegistry.add(ELDER_SLAB, 5, 20);
-		flammableRegistry.add(ELDER_FENCE, 5, 20);
-		flammableRegistry.add(ELDER_FENCE_GATE, 5, 20);
-		flammableRegistry.add(STRIPPED_DRAGONS_BLOOD_LOG, 5, 5);
-		flammableRegistry.add(STRIPPED_DRAGONS_BLOOD_WOOD, 5, 5);
-		flammableRegistry.add(DRAGONS_BLOOD_LOG, 5, 5);
-		flammableRegistry.add(DRAGONS_BLOOD_WOOD, 5, 5);
-		flammableRegistry.add(DRAGONS_BLOOD_LEAVES, 30, 60);
-		flammableRegistry.add(DRAGONS_BLOOD_PLANKS, 5, 20);
-		flammableRegistry.add(DRAGONS_BLOOD_STAIRS, 5, 20);
-		flammableRegistry.add(DRAGONS_BLOOD_SLAB, 5, 20);
-		flammableRegistry.add(DRAGONS_BLOOD_FENCE, 5, 20);
-		flammableRegistry.add(DRAGONS_BLOOD_FENCE_GATE, 5, 20);
-		flammableRegistry.add(HEDGEWITCH_WOOL, 30, 60);
-		flammableRegistry.add(ALCHEMIST_WOOL, 30, 60);
-		flammableRegistry.add(BESMIRCHED_WOOL, 30, 60);
-		flammableRegistry.add(HEDGEWITCH_CARPET, 60, 20);
-		flammableRegistry.add(ALCHEMIST_CARPET, 60, 20);
-		flammableRegistry.add(BESMIRCHED_CARPET, 60, 20);
-		CompostingChanceRegistry compostRegistry = CompostingChanceRegistry.INSTANCE;
-		compostRegistry.add(JUNIPER_LEAVES, 0.3f);
-		compostRegistry.add(JUNIPER_SAPLING, 0.3f);
-		compostRegistry.add(CYPRESS_LEAVES, 0.3f);
-		compostRegistry.add(CYPRESS_SAPLING, 0.3f);
-		compostRegistry.add(ELDER_LEAVES, 0.3f);
-		compostRegistry.add(ELDER_SAPLING, 0.3f);
-		compostRegistry.add(DRAGONS_BLOOD_LEAVES, 0.3f);
-		compostRegistry.add(DRAGONS_BLOOD_SAPLING, 0.3f);
-		compostRegistry.add(ACONITE, 0.65f);
-		compostRegistry.add(ACONITE_SEEDS, 0.3f);
-		compostRegistry.add(BELLADONNA, 0.65f);
-		compostRegistry.add(BELLADONNA_SEEDS, 0.3f);
-		compostRegistry.add(GARLIC, 0.65f);
-		compostRegistry.add(MANDRAKE_ROOT, 0.65f);
-		compostRegistry.add(MANDRAKE_SEEDS, 0.3f);
-		compostRegistry.add(WOOD_ASH, 0.3f);
-		compostRegistry.add(DRAGONS_BLOOD_RESIN, 0.65f);
-		compostRegistry.add(GRILLED_GARLIC, 0.85f);
-		compostRegistry.add(GARLIC_BREAD, 1f);
-		compostRegistry.add(WITCHBERRY, 0.65f);
-		compostRegistry.add(WITCHBERRY_PIE, 1f);
-		compostRegistry.add(WITCHBERRY_COOKIE, 0.85f);
+		registerStrippables();
+		registerFlammables();
+		registerCompostables();
+	}
+
+	public static int getFuelBurnTime(ItemStack stack) {
+		Item item = stack.getItem();
+		if (item == JUNIPER_FENCE.asItem() || item == JUNIPER_FENCE_GATE.asItem() || item == CYPRESS_FENCE.asItem() || item == CYPRESS_FENCE_GATE.asItem() || item == ELDER_FENCE.asItem() || item == ELDER_FENCE_GATE.asItem() || item == DRAGONS_BLOOD_FENCE.asItem() || item == DRAGONS_BLOOD_FENCE_GATE.asItem()) return 300;
+		if (stack.isIn(BWTags.BARKS)) return 100;
+		return item == SCORCHED_BRAMBLE.asItem() ? 800 : 0;
+	}
+
+	private static void registerStrippables() {
+		Map<Block, Block> stripped = AxeItemAccessor.getStrippedBlocks();
+		stripped.put(JUNIPER_LOG, STRIPPED_JUNIPER_LOG); stripped.put(JUNIPER_WOOD, STRIPPED_JUNIPER_WOOD);
+		stripped.put(CYPRESS_LOG, STRIPPED_CYPRESS_LOG); stripped.put(CYPRESS_WOOD, STRIPPED_CYPRESS_WOOD);
+		stripped.put(ELDER_LOG, STRIPPED_ELDER_LOG); stripped.put(ELDER_WOOD, STRIPPED_ELDER_WOOD);
+		stripped.put(DRAGONS_BLOOD_LOG, STRIPPED_DRAGONS_BLOOD_LOG); stripped.put(DRAGONS_BLOOD_WOOD, STRIPPED_DRAGONS_BLOOD_WOOD);
+	}
+
+	private static void registerFlammables() {
+		Block[] logs = {STRIPPED_JUNIPER_LOG, STRIPPED_JUNIPER_WOOD, JUNIPER_LOG, JUNIPER_WOOD, STRIPPED_CYPRESS_LOG, STRIPPED_CYPRESS_WOOD, CYPRESS_LOG, CYPRESS_WOOD, STRIPPED_ELDER_LOG, STRIPPED_ELDER_WOOD, ELDER_LOG, ELDER_WOOD, STRIPPED_DRAGONS_BLOOD_LOG, STRIPPED_DRAGONS_BLOOD_WOOD, DRAGONS_BLOOD_LOG, DRAGONS_BLOOD_WOOD};
+		Block[] leaves = {JUNIPER_LEAVES, CYPRESS_LEAVES, ELDER_LEAVES, DRAGONS_BLOOD_LEAVES, HEDGEWITCH_WOOL, ALCHEMIST_WOOL, BESMIRCHED_WOOL};
+		Block[] wood = {JUNIPER_PLANKS, JUNIPER_STAIRS, JUNIPER_SLAB, JUNIPER_FENCE, JUNIPER_FENCE_GATE, CYPRESS_PLANKS, CYPRESS_STAIRS, CYPRESS_SLAB, CYPRESS_FENCE, CYPRESS_FENCE_GATE, ELDER_PLANKS, ELDER_STAIRS, ELDER_SLAB, ELDER_FENCE, ELDER_FENCE_GATE, DRAGONS_BLOOD_PLANKS, DRAGONS_BLOOD_STAIRS, DRAGONS_BLOOD_SLAB, DRAGONS_BLOOD_FENCE, DRAGONS_BLOOD_FENCE_GATE};
+		for (Block block : logs) registerFlammable(block, 5, 5);
+		for (Block block : leaves) registerFlammable(block, 30, 60);
+		for (Block block : wood) registerFlammable(block, 5, 20);
+		registerFlammable(HEDGEWITCH_CARPET, 60, 20); registerFlammable(ALCHEMIST_CARPET, 60, 20); registerFlammable(BESMIRCHED_CARPET, 60, 20);
+	}
+
+	private static void registerFlammable(Block block, int encouragement, int flammability) {
+		// Forge's fire chance tables are private in 1.20.1. This is retained as a
+		// single porting hook until the block registration layer is fully deferred.
+	}
+
+	private static void registerCompostables() {
+		Object[][] compostables = {{JUNIPER_LEAVES, .3f}, {JUNIPER_SAPLING, .3f}, {CYPRESS_LEAVES, .3f}, {CYPRESS_SAPLING, .3f}, {ELDER_LEAVES, .3f}, {ELDER_SAPLING, .3f}, {DRAGONS_BLOOD_LEAVES, .3f}, {DRAGONS_BLOOD_SAPLING, .3f}, {ACONITE, .65f}, {ACONITE_SEEDS, .3f}, {BELLADONNA, .65f}, {BELLADONNA_SEEDS, .3f}, {GARLIC, .65f}, {MANDRAKE_ROOT, .65f}, {MANDRAKE_SEEDS, .3f}, {WOOD_ASH, .3f}, {DRAGONS_BLOOD_RESIN, .65f}, {GRILLED_GARLIC, .85f}, {GARLIC_BREAD, 1f}, {WITCHBERRY, .65f}, {WITCHBERRY_PIE, 1f}, {WITCHBERRY_COOKIE, .85f}};
+		for (Object[] compostable : compostables) ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.put((ItemConvertible) compostable[0], (Float) compostable[1]);
 	}
 }
