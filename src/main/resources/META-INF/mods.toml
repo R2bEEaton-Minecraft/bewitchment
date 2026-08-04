@@ -26,13 +26,6 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.bewitchment]]
-modId="fabric_api"
-mandatory=true
-versionRange="[${forgified_fabric_api_version},)"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies.bewitchment]]
 modId="curios"
 mandatory=true
 versionRange="[5.14.1,)"
