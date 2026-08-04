@@ -35,6 +35,7 @@ public final class BWComponentEvents {
 					key.copy(original, clone);
 				}
 			}
+			clone.calculateDimensions();
 		} finally {
 			original.invalidateCaps();
 		}

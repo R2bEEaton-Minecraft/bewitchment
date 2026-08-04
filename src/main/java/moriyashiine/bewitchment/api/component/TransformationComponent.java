@@ -15,6 +15,7 @@ import moriyashiine.bewitchment.common.component.entity.AdditionalWerewolfDataCo
 import moriyashiine.bewitchment.common.misc.BWUtil;
 import moriyashiine.bewitchment.common.packet.TransformationAbilityPacket;
 import moriyashiine.bewitchment.common.registry.*;
+import moriyashiine.bewitchment.forge.BewitchmentForgeTransformationEvents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -111,6 +112,8 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 				hungerManager.addExhaustion(0.5f);
 				if (!pledgedToLilith) {
 					TransformationAbilityPacket.useAbility(obj, true);
+				} else if (!obj.getAbilities().allowFlying) {
+					BewitchmentForgeTransformationEvents.setVampireFlight(obj, true);
 				}
 			}
 		}
