@@ -24,3 +24,17 @@ mandatory=true
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.bewitchment]]
+modId="fabric_api"
+mandatory=true
+versionRange="[${forgified_fabric_api_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.bewitchment]]
+modId="curios"
+mandatory=true
+versionRange="[${curios_version},)"
+ordering="NONE"
+side="BOTH"

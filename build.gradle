@@ -1,71 +1,143 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
+    id 'dev.architectury.loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
 version = project.mod_version
 group = project.maven_group
 
+configurations {
+    mixinExtrasDev
+}
+
 base {
     archivesName = "${project.archives_base_name}-forge-${project.minecraft_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+loom {
+    accessWidenerPath = file("src/main/resources/bewitchment.accesswidener")
 
-minecraft {
-    mappings channel: 'official', version: project.minecraft_version
-    copyIdeResources = true
+    forge {
+        mixinConfig "bewitchment.mixins.json"
+        convertAccessWideners = true
+    }
+
+    mixin {
+        defaultRefmapName.set("bewitchment.refmap.json")
+    }
+
     runs {
-        configureEach {
-            workingDirectory project.file('run-native-forge-port')
-            property 'forge.logging.console.level', 'info'
-            mods {
-                "${project.mod_id}" {
-                    source sourceSets.main
-                }
-            }
+        client {
+            client()
+            setConfigName("Forge Client")
+            ideConfigGenerated(true)
+            runDir("run-native-forge-port")
+            property "mixin.env.compatLevel", "JAVA_17"
+            // Loom otherwise discovers an IDE-managed bin/main output directory
+            // alongside Gradle's outputs.  Its unexpanded resource copies are not
+            // part of this build and make Forge reject the development mod.
+            environmentVariable "MOD_CLASSES", "main%%${layout.buildDirectory.file("devlibs/${base.archivesName.get()}-${project.version}-dev.jar").get().asFile}"
         }
-        client {}
-        server { args '--nogui' }
+        server {
+            server()
+            setConfigName("Forge Server")
+            ideConfigGenerated(true)
+            runDir("run-native-forge-port")
+            property "mixin.env.compatLevel", "JAVA_17"
+            environmentVariable "MOD_CLASSES", "main%%${layout.buildDirectory.file("devlibs/${base.archivesName.get()}-${project.version}-dev.jar").get().asFile}"
+        }
     }
 }
 
-sourceSets {
-    main {
-        java {
-            // The original mod is Yarn/Fabric source. It stays in the tree for
-            // incremental migration but is not valid ForgeGradle input yet.
-            setSrcDirs(['src/forge/java'])
-        }
-        resources {
-            setSrcDirs(['src/main/resources'])
-        }
-    }
-}
+// EMI and Apoli are optional integrations. Their Fabric entrypoints are not
+// loaded by Forge while their platform-native replacements are migrated.
+sourceSets.main.java.exclude('moriyashiine/bewitchment/client/integration/emi/**')
+sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
 
 repositories {
-    maven { url 'https://maven.minecraftforge.net/' }
+    maven { url "https://maven.su5ed.dev/releases" }
+    maven { url "https://maven.ladysnake.org/releases" }
+    maven { url "https://maven.terraformersmc.com" }
+    maven { url "https://maven.blamejared.com" }
+    maven { url "https://maven.ryanliptak.com" }
+    maven { url "https://maven.theillusivec4.top/" }
+    maven { url "https://maven.shedaniel.me" }
+    maven { url "https://api.modrinth.com/maven" }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    modImplementation "dev.su5ed.sinytra.fabric-api:fabric-api:${forgified_fabric_api_version}"
+    modImplementation "vazkii.patchouli:Patchouli:${patchouli_version}"
+    modImplementation "top.theillusivec4.curios:curios-forge:${curios_version}"
+    modImplementation "squeek.appleskin:appleskin-forge:${appleskin_version}"
+
+    mixinExtrasDev "io.github.llamalad7:mixinextras-forge:0.4.1"
 }
 
-tasks.named('processResources', ProcessResources).configure {
-    def properties = [
-            version: project.version,
-            minecraft_version_range: project.minecraft_version_range,
-            forge_version_range: project.forge_version_range,
-            loader_version_range: project.loader_version_range
-    ]
-    inputs.properties properties
-    // The native bootstrap does not yet register the legacy Fabric items or
-    // custom recipe serializers. Do not expose their datapack files until the
-    // corresponding Forge registries have been migrated.
-    exclude 'data/**'
-    filesMatching('META-INF/mods.toml') { expand properties }
+// Architectury Loom remaps Forgified Fabric API into Yarn names but removes its
+// Forge jarjar descriptor.  Forge therefore never exposes MixinExtras' nested
+// bootstrap to the development module layer.  This task creates a development-
+// only wrapper that exposes those bootstrap classes directly; release artifacts
+// are unaffected.
+def prepareMixinExtrasDev = tasks.register("prepareMixinExtrasDev") {
+    def output = layout.buildDirectory.file("dev-libs/mixinextras-forge-dev-v2.jar")
+    inputs.files(configurations.mixinExtrasDev)
+    outputs.file(output)
+    doLast {
+        File source = configurations.mixinExtrasDev.singleFile
+        File target = output.get().asFile
+        target.parentFile.mkdirs()
+        Set<String> entries = new LinkedHashSet<>()
+        new java.util.zip.ZipFile(source).withCloseable { outer ->
+            new java.util.zip.ZipOutputStream(new FileOutputStream(target)).withCloseable { result ->
+                outer.entries().each { entry ->
+                    if (!entry.directory && entry.name != "META-INF/jarjar/metadata.json") {
+                        result.putNextEntry(new java.util.zip.ZipEntry(entry.name))
+                        outer.getInputStream(entry).withCloseable { it.transferTo(result) }
+                        result.closeEntry()
+                        entries.add(entry.name)
+                    }
+                }
+                def nested = outer.getEntry("META-INF/jars/MixinExtras-0.4.1.jar")
+                new java.util.zip.ZipInputStream(outer.getInputStream(nested)).withCloseable { inner ->
+                    java.util.zip.ZipEntry entry
+                    while ((entry = inner.nextEntry) != null) {
+                        if (!entry.directory && entries.add(entry.name)) {
+                            result.putNextEntry(new java.util.zip.ZipEntry(entry.name))
+                            inner.transferTo(result)
+                            result.closeEntry()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    runtimeOnly files(prepareMixinExtrasDev)
+}
+
+tasks.named("configureLaunch") { dependsOn prepareMixinExtrasDev }
+tasks.named("runClient") { dependsOn prepareMixinExtrasDev, remapJar }
+tasks.named("runServer") { dependsOn prepareMixinExtrasDev, remapJar }
+
+processResources {
+    exclude "fabric.mod.json"
+    inputs.property "version", project.version
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version,
+                "forge_version_range": project.forge_version_range,
+                "loader_version_range": project.loader_version_range,
+                "minecraft_version_range": project.minecraft_version_range,
+                "forgified_fabric_api_version": project.forgified_fabric_api_version,
+                "curios_version": project.curios_version
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -73,6 +145,15 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.named('jar', Jar).configure {
-    finalizedBy 'reobfJar'
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+    finalizedBy 'remapJar'
 }
