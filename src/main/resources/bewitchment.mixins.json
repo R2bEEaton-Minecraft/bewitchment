@@ -81,6 +81,7 @@
   ],
   "client": [
 	"client.AbstractClientPlayerEntityMixin",
+	"client.BedBlockEntityRendererMixin",
 	"client.ClientWorldMixin",
 	"client.EntityRenderDispatcherMixin",
 	"client.GameRendererMixin",

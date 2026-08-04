@@ -33,6 +33,11 @@ public class CoffinBlock extends BedBlock {
 	}
 
 	@Override
+	public net.minecraft.block.entity.BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return null;
+	}
+
+	@Override
 	public void onEntityLand(BlockView world, Entity entity) {
 		BWObjects.CYPRESS_PLANKS.onEntityLand(world, entity);
 	}

@@ -28,9 +28,7 @@ public class BlockEntityTypeMixin {
 	@Inject(method = "supports", at = @At("HEAD"), cancellable = true)
 	private void supports(BlockState state, CallbackInfoReturnable<Boolean> callbackInfo) {
 		Object type = this;
-		if (type == BlockEntityType.BED && state.getBlock() instanceof CoffinBlock) {
-			callbackInfo.setReturnValue(true);
-		} else if (type == BlockEntityType.SIGN && (state.getBlock() instanceof SignBlock || state.getBlock() instanceof WallSignBlock)) {
+		if (type == BlockEntityType.SIGN && (state.getBlock() instanceof SignBlock || state.getBlock() instanceof WallSignBlock)) {
 			callbackInfo.setReturnValue(true);
 		} else if (type == BlockEntityType.HANGING_SIGN && (state.getBlock() instanceof HangingSignBlock || state.getBlock() instanceof WallHangingSignBlock)) {
 			callbackInfo.setReturnValue(true);
