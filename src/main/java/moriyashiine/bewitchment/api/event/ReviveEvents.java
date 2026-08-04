@@ -4,21 +4,19 @@
 
 package moriyashiine.bewitchment.api.event;
 
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-import static net.fabricmc.fabric.api.event.EventFactory.createArrayBacked;
 
 public final class ReviveEvents {
-	public static final Event<OnRevive> ON_REVIVE = createArrayBacked(OnRevive.class, listeners -> (player, source, poppet) -> {
+	public static final BWEvent<OnRevive> ON_REVIVE = BWEvent.create(OnRevive.class, listeners -> (player, source, poppet) -> {
 		for (OnRevive listener : listeners) {
 			listener.onRevive(player, source, poppet);
 		}
 	});
 
-	public static final Event<CancelRevive> CANCEL_REVIVE = createArrayBacked(CancelRevive.class, listeners -> (player, source, poppet) -> {
+	public static final BWEvent<CancelRevive> CANCEL_REVIVE = BWEvent.create(CancelRevive.class, listeners -> (player, source, poppet) -> {
 		for (CancelRevive listener : listeners) {
 			if (listener.shouldCancel(player, source, poppet)) {
 				return true;
