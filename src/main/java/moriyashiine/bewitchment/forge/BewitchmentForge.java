@@ -2,9 +2,13 @@ package moriyashiine.bewitchment.forge;
 
 import moriyashiine.bewitchment.client.BewitchmentClient;
 import moriyashiine.bewitchment.common.Bewitchment;
+import moriyashiine.bewitchment.common.entity.living.*;
+import moriyashiine.bewitchment.common.registry.BWEntityTypes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /** Forge entrypoint which delegates to the existing shared initializers. */
 @Mod(Bewitchment.MOD_ID)
@@ -13,5 +17,26 @@ public final class BewitchmentForge {
     public BewitchmentForge() {
         new Bewitchment().onInitialize();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> new BewitchmentClient().onInitializeClient());
+    }
+}
+
+@Mod.EventBusSubscriber(modid = Bewitchment.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+final class BewitchmentForgeModEvents {
+
+    @SubscribeEvent
+    public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(BWEntityTypes.OWL, OwlEntity.createAttributes().build());
+        event.put(BWEntityTypes.RAVEN, RavenEntity.createAttributes().build());
+        event.put(BWEntityTypes.SNAKE, SnakeEntity.createAttributes().build());
+        event.put(BWEntityTypes.TOAD, ToadEntity.createAttributes().build());
+        event.put(BWEntityTypes.GHOST, GhostEntity.createAttributes().build());
+        event.put(BWEntityTypes.VAMPIRE, VampireEntity.createAttributes().build());
+        event.put(BWEntityTypes.WEREWOLF, WerewolfEntity.createAttributes().build());
+        event.put(BWEntityTypes.HELLHOUND, HellhoundEntity.createAttributes().build());
+        event.put(BWEntityTypes.DEMON, DemonEntity.createAttributes().build());
+        event.put(BWEntityTypes.LEONARD, LeonardEntity.createAttributes().build());
+        event.put(BWEntityTypes.BAPHOMET, BaphometEntity.createAttributes().build());
+        event.put(BWEntityTypes.LILITH, LilithEntity.createAttributes().build());
+        event.put(BWEntityTypes.HERNE, HerneEntity.createAttributes().build());
     }
 }
