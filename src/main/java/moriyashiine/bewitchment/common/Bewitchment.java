@@ -189,23 +189,13 @@ public class Bewitchment {
 			}
 		});
 		BWScaleTypes.init();
-		BWObjects.init();
-		BWBoatTypes.init();
-		BWBlockEntityTypes.init();
-		BWEntityTypes.init();
-		BWStatusEffects.init();
-		BWEnchantments.init();
-		BWRitualFunctions.init();
-		BWFortunes.init();
-		BWSigils.init();
-		BWTransformations.init();
-		BWContracts.init();
-		BWCurses.init();
-		BWSoundEvents.init();
-		BWParticleTypes.init();
-		BWRecipeTypes.init();
-		BWWorldGenerators.init();
-		BWScreenHandlerTypes.init();
+		// Content registration is dispatched by ForgeRegistryEvents at the
+		// corresponding Forge registry event. Calling the Fabric-era bulk
+		// registration here happens after Forge has frozen those registries.
+	}
+
+	/** Runs after Forge has delivered its registry events. */
+	public static void registerAltarMapEntries() {
 		BewitchmentAPI.registerAltarMapEntries(BWObjects.STONE_WITCH_ALTAR);
 		BewitchmentAPI.registerAltarMapEntries(BWObjects.MOSSY_COBBLESTONE_WITCH_ALTAR);
 		BewitchmentAPI.registerAltarMapEntries(BWObjects.PRISMARINE_WITCH_ALTAR);

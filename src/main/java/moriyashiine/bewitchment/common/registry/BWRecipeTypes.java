@@ -63,7 +63,15 @@ public class BWRecipeTypes {
 	}
 
 	public static void init() {
+		registerSerializers();
+		registerTypes();
+	}
+
+	public static void registerSerializers() {
 		RECIPE_SERIALIZERS.keySet().forEach(recipeSerializer -> Registry.register(Registries.RECIPE_SERIALIZER, RECIPE_SERIALIZERS.get(recipeSerializer), recipeSerializer));
+	}
+
+	public static void registerTypes() {
 		RECIPE_TYPES.keySet().forEach(recipeType -> Registry.register(Registries.RECIPE_TYPE, RECIPE_TYPES.get(recipeType), recipeType));
 	}
 }

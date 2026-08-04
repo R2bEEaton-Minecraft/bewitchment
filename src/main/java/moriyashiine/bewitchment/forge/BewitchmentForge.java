@@ -60,11 +60,11 @@ final class BewitchmentForgeModEvents {
 
 	public static void registerContent(RegisterEvent event) {
 		if (event.getRegistryKey().equals(RegistryKeys.BLOCK)) {
-			BWObjects.registerBlocks();
+			BWObjects.registerBlocks(event);
 		} else if (event.getRegistryKey().equals(RegistryKeys.ITEM)) {
-			BWObjects.registerItems();
+			BWObjects.registerItems(event);
 		} else if (event.getRegistryKey().equals(RegistryKeys.ITEM_GROUP)) {
-			BWObjects.registerItemGroup();
+			BWObjects.registerItemGroup(event);
 		} else if (event.getRegistryKey().equals(RegistryKeys.BLOCK_ENTITY_TYPE)) {
 			moriyashiine.bewitchment.common.registry.BWBlockEntityTypes.init();
 		} else if (event.getRegistryKey().equals(RegistryKeys.ENTITY_TYPE)) {
