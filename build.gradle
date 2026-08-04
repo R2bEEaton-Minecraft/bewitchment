@@ -74,7 +74,7 @@ dependencies {
     modCompileOnly "com.terraformersmc.terraform-api:terraform-wood-api-v1:${terraform_api_version}"
     modCompileOnly "vazkii.patchouli:Patchouli:${patchouli_version}"
     modCompileOnly "com.github.Virtuoel:Pehkui:${pehkui_version}"
-    modCompileOnly "maven.modrinth:trinkets:${trinkets_version}"
+    modCompileOnly "maven.modrinth:5aaWibi9:${trinkets_version}"
     modCompileOnly "com.github.apace100:apoli:${apoli_version}"
     modCompileOnly "squeek.appleskin:appleskin-forge:${appleskin_version}"
 }
