@@ -50,8 +50,13 @@ loom {
 }
 
 // EMI publishes a Forge build and its plugin API is loader-neutral, so that
-// integration is compiled and discovered through @EmiEntrypoint.  Apoli has no
-// Forge release, so its compatibility mixin stays out of the build.
+// integration is compiled and discovered through @EmiEntrypoint.
+//
+// Apoli publishes only a Fabric build, whose intermediary names cannot be
+// resolved in this Yarn-on-Forge workspace, so its compatibility mixin cannot
+// be compiled here.  Excluding it changes no behaviour: BWMixinPlugin applies
+// that mixin only when apoli is loaded, and apoli cannot load on Forge, so the
+// guard is false on this platform either way.
 sourceSets.main.java.exclude('moriyashiine/bewitchment/mixin/integration/apoli/**')
 
 repositories {

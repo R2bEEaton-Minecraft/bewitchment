@@ -80,6 +80,7 @@
 	"vampirehack.RemoveFireInvulnerabilityMixin"
   ],
   "client": [
+	"client.AbstractClientPlayerEntityMixin",
 	"client.ClientWorldMixin",
 	"client.EntityRenderDispatcherMixin",
 	"client.GameRendererMixin",

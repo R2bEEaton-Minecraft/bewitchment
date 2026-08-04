@@ -4,9 +4,10 @@
 
 package moriyashiine.bewitchment.common.component.entity;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
+import moriyashiine.bewitchment.common.registry.BWComponents;
 import moriyashiine.bewitchment.common.registry.BWStatusEffects;
-import moriyashiine.bewitchment.common.statuseffect.PolymorphStatusEffect;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -14,7 +15,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class PolymorphComponent implements ServerTickingComponent {
+/**
+ * The identity a polymorphed player is wearing.
+ *
+ * <p>Impersonate synchronizes the swapped profile itself on Fabric.  There is no
+ * Forge equivalent, so the disguise is applied on the client instead and this
+ * component carries the profile there.
+ */
+public class PolymorphComponent implements AutoSyncedComponent, ServerTickingComponent {
 	private final Entity obj;
 	private UUID uuid;
 	private String name;
@@ -53,6 +61,7 @@ public class PolymorphComponent implements ServerTickingComponent {
 
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
+		BWComponents.POLYMORPH_COMPONENT.sync(obj);
 	}
 
 	public String getName() {
@@ -61,5 +70,6 @@ public class PolymorphComponent implements ServerTickingComponent {
 
 	public void setName(String name) {
 		this.name = name;
+		BWComponents.POLYMORPH_COMPONENT.sync(obj);
 	}
 }
