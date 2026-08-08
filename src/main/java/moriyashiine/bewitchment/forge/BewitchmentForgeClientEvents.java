@@ -6,8 +6,12 @@ import moriyashiine.bewitchment.client.model.ContributorHornsModel;
 import moriyashiine.bewitchment.client.model.entity.living.*;
 import moriyashiine.bewitchment.client.model.equipment.armor.WitchArmorModel;
 import moriyashiine.bewitchment.client.model.equipment.trinket.*;
+import moriyashiine.bewitchment.client.particle.CauldronBubbleParticle;
+import moriyashiine.bewitchment.client.particle.IncenseSmokeParticle;
+import moriyashiine.bewitchment.common.registry.BWParticleTypes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -15,6 +19,15 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = "bewitchment", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class BewitchmentForgeClientEvents {
 	private BewitchmentForgeClientEvents() {}
+
+	@SubscribeEvent
+	public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+		// FMLClientSetup runs after Forge has created the particle sprite sets.
+		// Registering there leaves Forgified Fabric's providers unstitched, so use
+		// Forge's dedicated event for both sprite-backed particle types.
+		event.registerSpriteSet(BWParticleTypes.CAULDRON_BUBBLE, CauldronBubbleParticle.Factory::new);
+		event.registerSpriteSet(BWParticleTypes.INCENSE_SMOKE, IncenseSmokeParticle.Factory::new);
+	}
 
 	@SubscribeEvent
 	public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {

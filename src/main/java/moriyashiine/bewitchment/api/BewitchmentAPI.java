@@ -190,20 +190,18 @@ public class BewitchmentAPI {
 
 	public static boolean isVampire(Entity entity, boolean includeHumanForm) {
 		if (entity instanceof PlayerEntity player) {
-			TransformationComponent transformationComponent = BWComponents.TRANSFORMATION_COMPONENT.get(player);
-			if (transformationComponent.getTransformation() == BWTransformations.VAMPIRE) {
-				return includeHumanForm || transformationComponent.isAlternateForm();
-			}
+			return BWComponents.TRANSFORMATION_COMPONENT.maybeGet(player)
+					.map(transformationComponent -> transformationComponent.getTransformation() == BWTransformations.VAMPIRE && (includeHumanForm || transformationComponent.isAlternateForm()))
+					.orElse(false);
 		}
 		return entity instanceof VampireEntity;
 	}
 
 	public static boolean isWerewolf(Entity entity, boolean includeHumanForm) {
 		if (entity instanceof PlayerEntity player) {
-			TransformationComponent transformationComponent = BWComponents.TRANSFORMATION_COMPONENT.get(player);
-			if (transformationComponent.getTransformation() == BWTransformations.WEREWOLF) {
-				return includeHumanForm || transformationComponent.isAlternateForm();
-			}
+			return BWComponents.TRANSFORMATION_COMPONENT.maybeGet(player)
+					.map(transformationComponent -> transformationComponent.getTransformation() == BWTransformations.WEREWOLF && (includeHumanForm || transformationComponent.isAlternateForm()))
+					.orElse(false);
 		}
 		return entity instanceof WerewolfEntity;
 	}
