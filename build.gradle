@@ -143,7 +143,10 @@ processResources {
                 "loader_version_range": project.loader_version_range,
                 "minecraft_version_range": project.minecraft_version_range,
                 "forgified_fabric_api_version": project.forgified_fabric_api_version,
-                "curios_version": project.curios_version
+                "patchouli_version": project.patchouli_version,
+                "curios_version": project.curios_version,
+                "appleskin_version": project.appleskin_version,
+                "emi_version": project.emi_version
     }
 }
 

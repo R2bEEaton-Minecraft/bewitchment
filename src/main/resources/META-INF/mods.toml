@@ -33,8 +33,31 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.bewitchment]]
+modId="patchouli"
+mandatory=true
+versionRange="[${patchouli_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.bewitchment]]
 modId="curios"
 mandatory=true
 versionRange="[${curios_version},)"
 ordering="NONE"
 side="BOTH"
+
+# Client-side quality-of-life integrations.  Bewitchment runs normally when
+# either mod is absent; if installed, load it before Bewitchment's hooks.
+[[dependencies.bewitchment]]
+modId="appleskin"
+mandatory=false
+versionRange="[${appleskin_version},)"
+ordering="AFTER"
+side="CLIENT"
+
+[[dependencies.bewitchment]]
+modId="emi"
+mandatory=false
+versionRange="[${emi_version},)"
+ordering="AFTER"
+side="CLIENT"

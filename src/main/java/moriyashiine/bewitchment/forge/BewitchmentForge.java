@@ -1,6 +1,7 @@
 package moriyashiine.bewitchment.forge;
 
 import moriyashiine.bewitchment.client.BewitchmentClient;
+import moriyashiine.bewitchment.client.integration.appleskin.BWAppleskinIntegration;
 import moriyashiine.bewitchment.api.client.model.BroomEntityModel;
 import moriyashiine.bewitchment.client.model.ContributorHornsModel;
 import moriyashiine.bewitchment.client.model.entity.living.*;
@@ -16,6 +17,7 @@ import net.minecraft.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.common.Mod;
@@ -66,6 +68,11 @@ public final class BewitchmentForge {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modBus.addListener(BewitchmentForgeClientModEvents::clientSetup);
             modBus.addListener(BewitchmentForgeClientModEvents::registerLayerDefinitions);
+			// AppleSkin is optional, just as it is on the Fabric build.  Do not
+			// load its event types on clients that have not installed it.
+			if (ModList.get().isLoaded("appleskin")) {
+				BWAppleskinIntegration.init();
+			}
         });
     }
 }
