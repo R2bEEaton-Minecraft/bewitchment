@@ -27,7 +27,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Inject(method = "getGroup", at = @At("HEAD"), cancellable = true)
 	private void getGroup(CallbackInfoReturnable<EntityGroup> callbackInfo) {
-		if ((Object) this instanceof PlayerEntity player && !BWComponents.PLEDGE_COMPONENT.get(player).getPledge().equals(BWPledges.NONE) && !BewitchmentAPI.isVampire(this, true)) {
+		if ((Object) this instanceof PlayerEntity player && BWComponents.PLEDGE_COMPONENT.maybeGet(player).map(component -> !component.getPledge().equals(BWPledges.NONE)).orElse(false) && !BewitchmentAPI.isVampire(this, true)) {
 			callbackInfo.setReturnValue(BewitchmentAPI.DEMON);
 		}
 	}

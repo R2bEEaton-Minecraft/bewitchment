@@ -22,7 +22,7 @@ public class TransformationAbilityEvent implements ClientTickEvents.EndWorldTick
 				transformationAbilityCooldown = 20;
 				moriyashiine.bewitchment.common.packet.TransformationAbilityPacket.send();
 			}
-			if (BWComponents.BROOM_USER_COMPONENT.get(player).isPressingForward()) {
+			if (BWComponents.BROOM_USER_COMPONENT.maybeGet(player).map(component -> component.isPressingForward()).orElse(false)) {
 				TogglePressingForwardPacket.send(false);
 			}
 			if (MinecraftClient.getInstance().options.forwardKey.isPressed() && player.getVehicle() instanceof BroomEntity) {
