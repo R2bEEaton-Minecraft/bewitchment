@@ -22,7 +22,7 @@ public abstract class EntityMixin {
 
 	@Inject(method = "setOnFireFor", at = @At("HEAD"), cancellable = true)
 	private void setOnFireFor(int seconds, CallbackInfo callbackInfo) {
-		if (!world.isClient && (Object) this instanceof MobEntity mob && BWComponents.FAKE_MOB_COMPONENT.get(mob).getTarget() != null) {
+		if (!world.isClient && (Object) this instanceof MobEntity mob && BWComponents.FAKE_MOB_COMPONENT.maybeGet(mob).map(component -> component.getTarget() != null).orElse(false)) {
 			callbackInfo.cancel();
 		}
 	}

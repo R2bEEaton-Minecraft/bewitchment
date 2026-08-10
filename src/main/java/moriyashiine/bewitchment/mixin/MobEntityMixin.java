@@ -35,7 +35,7 @@ public abstract class MobEntityMixin extends LivingEntity {
 			if (target instanceof GhostEntity) {
 				return null;
 			}
-			if (target instanceof MobEntity mob && getUuid().equals(BWComponents.MINION_COMPONENT.get(mob).getMaster())) {
+			if (target instanceof MobEntity mob && BWComponents.MINION_COMPONENT.maybeGet(mob).map(component -> getUuid().equals(component.getMaster())).orElse(false)) {
 				return null;
 			}
 			if (isUndead()) {

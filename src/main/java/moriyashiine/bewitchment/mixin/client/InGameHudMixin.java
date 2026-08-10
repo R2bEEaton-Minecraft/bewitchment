@@ -40,6 +40,14 @@ public abstract class InGameHudMixin {
 	@Final
 	private MinecraftClient client;
 
+	@Inject(method = "renderStatusBars", at = @At("HEAD"))
+	private void bewitchment$prepareVampireHud(DrawContext context, CallbackInfo ci) {
+		// The food icons are redirected below.  Set this before vanilla starts
+		// drawing them; the blood meter itself is drawn at the established HUD
+		// profiler marker in renderPre.
+		hidden = BewitchmentAPI.isVampire(client.player, true);
+	}
+
 	@Inject(method = "renderStatusBars", at = @At(value = "INVOKE", shift = At.Shift.AFTER, ordinal = 2, target = "Lnet/minecraft/client/MinecraftClient;getProfiler()Lnet/minecraft/util/profiler/Profiler;"))
 	private void renderPre(DrawContext context, CallbackInfo ci) {
 		BWComponents.MAGIC_COMPONENT.maybeGet(client.player).ifPresent(magicComponent -> {
@@ -52,7 +60,6 @@ public abstract class InGameHudMixin {
 			}
 		});
 		if (BewitchmentAPI.isVampire(client.player, true)) {
-			hidden = true;
 			drawBlood(context, client.player, (int) (context.getScaledWindowWidth() / 2F + 82), context.getScaledWindowHeight() - 39, 10);
 			if (client.player.isSneaking() && client.player.isPartOfGame()) {
 				if (client.targetedEntity instanceof LivingEntity living && living.getType().isIn(BWTags.HAS_BLOOD)) {

@@ -43,7 +43,7 @@ public abstract class MobEntityMixin extends LivingEntity {
 	@ModifyVariable(method = "setTarget", at = @At("HEAD"), argsOnly = true)
 	private LivingEntity modifyTarget(LivingEntity target) {
 		if (!getWorld().isClient && target != null) {
-			UUID insanityTargetUUID = BWComponents.FAKE_MOB_COMPONENT.get(this).getTarget();
+			UUID insanityTargetUUID = BWComponents.FAKE_MOB_COMPONENT.maybeGet(this).map(component -> component.getTarget()).orElse(null);
 			if (insanityTargetUUID != null && !target.getUuid().equals(insanityTargetUUID)) {
 				return null;
 			}
