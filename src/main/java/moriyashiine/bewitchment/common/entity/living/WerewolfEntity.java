@@ -24,8 +24,10 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraftforge.common.ForgeMod;
@@ -63,7 +65,7 @@ public class WerewolfEntity extends BWHostileEntity {
 				dropStack(getOffHandStack().split(1));
 			}
 			if (storedVillager != null && age % 20 == 0 && (getWorld().isDay() || BewitchmentAPI.getMoonPhase(getWorld()) != 0)) {
-				VillagerEntity entity = EntityType.VILLAGER.create(getWorld());
+				VillagerEntity entity = createVillager(getWorld());
 				if (entity != null) {
 					PlayerLookup.tracking(this).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, this));
 					getWorld().playSound(null, getX(), getY(), getZ(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, getSoundCategory(), getSoundVolume(), getSoundPitch());
@@ -83,6 +85,17 @@ public class WerewolfEntity extends BWHostileEntity {
 				}
 			}
 		}
+	}
+
+	/**
+	 * MCA replaces a vanilla villager one tick after it spawns, but that queue
+	 * does not copy Forge capabilities.  Spawn one of MCA's villager types
+	 * directly so the stored-werewolf component survives until the next moon.
+	 */
+	private VillagerEntity createVillager(World world) {
+		Identifier id = new Identifier("mca", random.nextBoolean() ? "male_villager" : "female_villager");
+		Entity mcaVillager = Registries.ENTITY_TYPE.getOrEmpty(id).map(type -> type.create(world)).orElse(null);
+		return mcaVillager instanceof VillagerEntity villager ? villager : EntityType.VILLAGER.create(world);
 	}
 
 	@Override
