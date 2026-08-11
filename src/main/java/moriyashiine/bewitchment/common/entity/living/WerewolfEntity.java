@@ -24,12 +24,13 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.village.VillagerProfession;
-import net.minecraft.village.VillagerType;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
@@ -95,35 +96,27 @@ public class WerewolfEntity extends BWHostileEntity {
 
 	/**
 	 * MCA replaces a vanilla villager one tick after it spawns, but that queue
-	 * does not copy Forge capabilities.  Its factory creates a fully initialized
-	 * MCA villager directly, keeping the stored-werewolf component intact.
+	 * does not copy Forge capabilities.  Spawn MCA's entity directly and retain
+	 * its MCA-owned skin/genetics NBT while copying vanilla villager state.
 	 */
 	private VillagerEntity createVillager(World world, NbtCompound storedVillager) {
-		try {
-			VillagerEntity previousVillager = EntityType.VILLAGER.create(world);
-			if (previousVillager == null) {
-				return null;
-			}
-			previousVillager.readNbt(storedVillager);
-			Class<?> factory = Class.forName("net.mca.entity.VillagerFactory");
-			Object builder = factory.getMethod("newVillager", World.class).invoke(null, world);
-			VillagerType type = previousVillager.getVillagerData().getType();
-			VillagerProfession profession = previousVillager.getVillagerData().getProfession();
-			builder = factory.getMethod("withType", VillagerType.class).invoke(builder, type);
-			builder = factory.getMethod("withProfession", VillagerProfession.class, int.class).invoke(builder, profession, previousVillager.getVillagerData().getLevel());
-			builder = factory.getMethod("withAge", int.class).invoke(builder, previousVillager.getBreedingAge());
-			if (previousVillager.hasCustomName()) {
-				builder = factory.getMethod("withName", String.class).invoke(builder, previousVillager.getName().getString());
-			}
-			Object mcaVillager = factory.getMethod("build").invoke(builder);
-			if (mcaVillager instanceof VillagerEntity villager) {
-				return villager;
-			}
-		} catch (ReflectiveOperationException ignored) {
-			// MCA is optional.  The normal vanilla villager path remains unchanged
-			// when it is not installed.
+		VillagerEntity previousVillager = EntityType.VILLAGER.create(world);
+		if (previousVillager == null) {
+			return null;
 		}
-		return EntityType.VILLAGER.create(world);
+		previousVillager.readNbt(storedVillager);
+		Identifier id = new Identifier("mca", random.nextBoolean() ? "male_villager" : "female_villager");
+		Entity mcaVillager = Registries.ENTITY_TYPE.getOrEmpty(id).map(type -> type.create(world)).orElse(null);
+		if (mcaVillager instanceof VillagerEntity villager) {
+			villager.setVillagerData(previousVillager.getVillagerData());
+			villager.setBreedingAge(previousVillager.getBreedingAge());
+			Text customName = previousVillager.getCustomName();
+			if (customName != null) {
+				villager.setCustomName(customName);
+			}
+			return villager;
+		}
+		return previousVillager;
 	}
 
 	private static boolean isMcaVillager(VillagerEntity villager) {
