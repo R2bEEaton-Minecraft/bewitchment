@@ -33,17 +33,19 @@ public class PolymorphComponent implements AutoSyncedComponent, ServerTickingCom
 
 	@Override
 	public void readFromNbt(NbtCompound tag) {
-		if (tag.contains("UUID")) {
-			uuid = tag.getUuid("UUID");
-			name = tag.getString("Name");
-		}
+		// A sync packet without a profile is how the server removes a disguise.
+		// Clear both fields rather than leaving the old client-side profile active.
+		uuid = tag.containsUuid("UUID") ? tag.getUuid("UUID") : null;
+		name = tag.contains("Name") ? tag.getString("Name") : null;
 	}
 
 	@Override
 	public void writeToNbt(@NotNull NbtCompound tag) {
 		if (getUuid() != null) {
 			tag.putUuid("UUID", uuid);
-			tag.putString("Name", name);
+			// UUID and name are assigned in separate calls by potion processing.
+			// The first synchronization must remain valid while the name is pending.
+			tag.putString("Name", name == null ? "" : name);
 		}
 	}
 

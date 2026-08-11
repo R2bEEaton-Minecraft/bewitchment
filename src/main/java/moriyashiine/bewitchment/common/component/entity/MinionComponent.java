@@ -35,9 +35,12 @@ public class MinionComponent implements ServerTickingComponent {
 
 	@Override
 	public void serverTick() {
+		if (obj.isRemoved()) {
+			return;
+		}
 		if (getMaster() != null) {
 			Entity master = ((ServerWorld) obj.getWorld()).getEntity(getMaster());
-			if (master instanceof MobEntity mob && !mob.isDead() && mob.getTarget() != null) {
+			if (master instanceof MobEntity mob && !mob.isRemoved() && !mob.isDead() && mob.getTarget() != null) {
 				obj.setTarget(mob.getTarget());
 			} else {
 				PlayerLookup.tracking(obj).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, obj));
