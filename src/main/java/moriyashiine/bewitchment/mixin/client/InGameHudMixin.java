@@ -50,15 +50,6 @@ public abstract class InGameHudMixin {
 
 	@Inject(method = "renderStatusBars", at = @At(value = "INVOKE", shift = At.Shift.AFTER, ordinal = 2, target = "Lnet/minecraft/client/MinecraftClient;getProfiler()Lnet/minecraft/util/profiler/Profiler;"))
 	private void renderPre(DrawContext context, CallbackInfo ci) {
-		BWComponents.MAGIC_COMPONENT.maybeGet(client.player).ifPresent(magicComponent -> {
-			if (magicComponent.getMagicTimer() > 0) {
-				RenderSystem.setShaderColor(1, 1, 1, magicComponent.getMagicTimer() / 10f);
-				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 13, (context.getScaledWindowHeight() - 74) / 2, 25, 0, 7, 74);
-				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 13, (context.getScaledWindowHeight() - 74) / 2, 32, 0, 7, (int) (74 - (magicComponent.getMagic() * 74f / MagicComponent.MAX_MAGIC)));
-				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 4, (context.getScaledWindowHeight() - 102) / 2, 0, 0, 25, 102);
-				RenderSystem.setShaderColor(1, 1, 1, 1);
-			}
-		});
 		if (BewitchmentAPI.isVampire(client.player, true)) {
 			drawBlood(context, client.player, (int) (context.getScaledWindowWidth() / 2F + 82), context.getScaledWindowHeight() - 39, 10);
 			if (client.player.isSneaking() && client.player.isPartOfGame()) {
@@ -67,6 +58,20 @@ public abstract class InGameHudMixin {
 				}
 			}
 		}
+	}
+
+	/** Draw after vanilla's status bars so the Forge HUD call order cannot hide it. */
+	@Inject(method = "renderStatusBars", at = @At("TAIL"))
+	private void bewitchment$renderMagic(DrawContext context, CallbackInfo ci) {
+		BWComponents.MAGIC_COMPONENT.maybeGet(client.player).ifPresent(magicComponent -> {
+			if (magicComponent.getMagicTimer() > 0) {
+				RenderSystem.setShaderColor(1, 1, 1, Math.min(1, magicComponent.getMagicTimer() / 10f));
+				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 13, (context.getScaledWindowHeight() - 74) / 2, 25, 0, 7, 74);
+				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 13, (context.getScaledWindowHeight() - 74) / 2, 32, 0, 7, (int) (74 - (magicComponent.getMagic() * 74f / MagicComponent.MAX_MAGIC)));
+				context.drawTexture(BEWITCHMENT_GUI_ICONS_TEXTURE, 4, (context.getScaledWindowHeight() - 102) / 2, 0, 0, 25, 102);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+			}
+		});
 	}
 
 	@ModifyArg(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V", ordinal = 3))
