@@ -24,7 +24,6 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -32,6 +31,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -106,7 +106,10 @@ public class WerewolfEntity extends BWHostileEntity {
 		}
 		previousVillager.readNbt(storedVillager);
 		Identifier id = new Identifier("mca", random.nextBoolean() ? "male_villager" : "female_villager");
-		Entity mcaVillager = Registries.ENTITY_TYPE.getOrEmpty(id).map(type -> type.create(world)).orElse(null);
+		// MCA registers its entity types through Forge's registry.  The shared
+		// vanilla registry does not include those entries on this port.
+		EntityType<?> mcaType = ForgeRegistries.ENTITY_TYPES.getValue(id);
+		Entity mcaVillager = mcaType == null ? null : mcaType.create(world);
 		if (mcaVillager instanceof VillagerEntity villager) {
 			villager.setVillagerData(previousVillager.getVillagerData());
 			villager.setBreedingAge(previousVillager.getBreedingAge());
