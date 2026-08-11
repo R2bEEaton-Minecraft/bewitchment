@@ -24,12 +24,12 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.village.VillagerProfession;
+import net.minecraft.village.VillagerType;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
@@ -65,11 +65,17 @@ public class WerewolfEntity extends BWHostileEntity {
 				dropStack(getOffHandStack().split(1));
 			}
 			if (storedVillager != null && age % 20 == 0 && (getWorld().isDay() || BewitchmentAPI.getMoonPhase(getWorld()) != 0)) {
-				VillagerEntity entity = createVillager(getWorld());
+				VillagerEntity entity = createVillager(getWorld(), storedVillager);
 				if (entity != null) {
+					// MCA assigns its genetics, skin, relationships, and AI during
+					// initialization.  This must happen before applying the saved
+					// vanilla villager data from the werewolf transformation.
+					entity.initialize((ServerWorldAccess) getWorld(), getWorld().getLocalDifficulty(getBlockPos()), SpawnReason.CONVERSION, null, null);
 					PlayerLookup.tracking(this).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, this));
 					getWorld().playSound(null, getX(), getY(), getZ(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, getSoundCategory(), getSoundVolume(), getSoundPitch());
-					entity.readNbt(storedVillager);
+					if (!isMcaVillager(entity)) {
+						entity.readNbt(storedVillager);
+					}
 					entity.updatePositionAndAngles(getX(), getY(), getZ(), random.nextFloat() * 360, 0);
 					entity.setHealth(entity.getMaxHealth() * (getHealth() / getMaxHealth()));
 					entity.setFireTicks(getFireTicks());
@@ -89,13 +95,39 @@ public class WerewolfEntity extends BWHostileEntity {
 
 	/**
 	 * MCA replaces a vanilla villager one tick after it spawns, but that queue
-	 * does not copy Forge capabilities.  Spawn one of MCA's villager types
-	 * directly so the stored-werewolf component survives until the next moon.
+	 * does not copy Forge capabilities.  Its factory creates a fully initialized
+	 * MCA villager directly, keeping the stored-werewolf component intact.
 	 */
-	private VillagerEntity createVillager(World world) {
-		Identifier id = new Identifier("mca", random.nextBoolean() ? "male_villager" : "female_villager");
-		Entity mcaVillager = Registries.ENTITY_TYPE.getOrEmpty(id).map(type -> type.create(world)).orElse(null);
-		return mcaVillager instanceof VillagerEntity villager ? villager : EntityType.VILLAGER.create(world);
+	private VillagerEntity createVillager(World world, NbtCompound storedVillager) {
+		try {
+			VillagerEntity previousVillager = EntityType.VILLAGER.create(world);
+			if (previousVillager == null) {
+				return null;
+			}
+			previousVillager.readNbt(storedVillager);
+			Class<?> factory = Class.forName("net.mca.entity.VillagerFactory");
+			Object builder = factory.getMethod("newVillager", World.class).invoke(null, world);
+			VillagerType type = previousVillager.getVillagerData().getType();
+			VillagerProfession profession = previousVillager.getVillagerData().getProfession();
+			builder = factory.getMethod("withType", VillagerType.class).invoke(builder, type);
+			builder = factory.getMethod("withProfession", VillagerProfession.class, int.class).invoke(builder, profession, previousVillager.getVillagerData().getLevel());
+			builder = factory.getMethod("withAge", int.class).invoke(builder, previousVillager.getBreedingAge());
+			if (previousVillager.hasCustomName()) {
+				builder = factory.getMethod("withName", String.class).invoke(builder, previousVillager.getName().getString());
+			}
+			Object mcaVillager = factory.getMethod("build").invoke(builder);
+			if (mcaVillager instanceof VillagerEntity villager) {
+				return villager;
+			}
+		} catch (ReflectiveOperationException ignored) {
+			// MCA is optional.  The normal vanilla villager path remains unchanged
+			// when it is not installed.
+		}
+		return EntityType.VILLAGER.create(world);
+	}
+
+	private static boolean isMcaVillager(VillagerEntity villager) {
+		return villager.getClass().getName().startsWith("net.mca.");
 	}
 
 	@Override

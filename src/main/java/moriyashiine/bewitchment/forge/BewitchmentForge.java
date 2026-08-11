@@ -66,8 +66,10 @@ public final class BewitchmentForge {
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeGameplayEvents::applyVoodooDrowning);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeTransformationEvents::resizeTransformedPlayers);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            modBus.addListener(BewitchmentForgeClientModEvents::clientSetup);
-            modBus.addListener(BewitchmentForgeClientModEvents::registerLayerDefinitions);
+			modBus.addListener(BewitchmentForgeClientModEvents::clientSetup);
+			modBus.addListener(BewitchmentForgeClientModEvents::registerLayerDefinitions);
+			MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeHudEvents::hideVampireFood);
+			MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeHudEvents::renderStatusMeters);
 			// AppleSkin is optional, just as it is on the Fabric build.  Do not
 			// load its event types on clients that have not installed it.
 			if (ModList.get().isLoaded("appleskin")) {
