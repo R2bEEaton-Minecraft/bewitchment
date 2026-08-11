@@ -9,7 +9,6 @@ import moriyashiine.bewitchment.common.registry.BWDamageSources;
 import moriyashiine.bewitchment.common.registry.BWObjects;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -31,14 +30,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 	protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
 		super(entityType, world);
-	}
-
-	@ModifyVariable(method = "applyDamage", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/entity/player/PlayerEntity;getHealth()F"), ordinal = 0, argsOnly = true)
-	private float modifyDamage(float amount, DamageSource source) {
-		if (!getWorld().isClient) {
-			amount = BWDamageSources.handleDamage(this, source, amount);
-		}
-		return amount;
 	}
 
 	@ModifyVariable(method = "addExhaustion", at = @At("HEAD"), argsOnly = true)

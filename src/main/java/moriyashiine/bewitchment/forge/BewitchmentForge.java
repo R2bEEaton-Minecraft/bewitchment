@@ -14,6 +14,7 @@ import moriyashiine.bewitchment.common.registry.*;
 import moriyashiine.bewitchment.forge.component.BWComponentEvents;
 import moriyashiine.bewitchment.forge.component.BWEntityComponents;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingBreatheEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -64,6 +66,8 @@ public final class BewitchmentForge {
         MinecraftForge.EVENT_BUS.addListener(BWComponentEvents::syncOnJoin);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeModEvents::registerFuelBurnTimes);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeGameplayEvents::applyVoodooDrowning);
+
+        MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeGameplayEvents::applyTransformationDamage);
         MinecraftForge.EVENT_BUS.addListener(BewitchmentForgeTransformationEvents::resizeTransformedPlayers);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 			modBus.addListener(BewitchmentForgeClientModEvents::clientSetup);
@@ -143,6 +147,14 @@ final class BewitchmentForgeModEvents {
 }
 
 final class BewitchmentForgeGameplayEvents {
+
+	/** Forge applies player damage outside the vanilla applyDamage method used by
+	 * the original Fabric mixin.  Mutate it here before health is reduced. */
+	public static void applyTransformationDamage(LivingHurtEvent event) {
+		if (event.getEntity() instanceof PlayerEntity player && !player.getWorld().isClient) {
+			event.setAmount(BWDamageSources.handleDamage(player, event.getSource(), event.getAmount()));
+		}
+	}
 
 	public static void applyVoodooDrowning(LivingBreatheEvent event) {
 		if (BWComponents.ADDITIONAL_WATER_DATA_COMPONENT.get(event.getEntity()).isSubmerged()) {
