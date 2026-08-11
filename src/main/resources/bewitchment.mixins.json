@@ -80,7 +80,7 @@
 	"vampirehack.ProtectionEnchantmentMixin",
 	"vampirehack.RemoveFireInvulnerabilityMixin"
   ],
-  "client": [
+	"client": [
 	"client.AbstractClientPlayerEntityMixin",
 	"client.BedBlockEntityRendererMixin",
 	"client.ClientWorldMixin",
@@ -88,6 +88,8 @@
 	"client.GameRendererMixin",
 	"client.HeldItemFeatureRendererMixin",
 	"client.InGameHudMixin",
+	"client.integration.mca.ClothingLayerMixin",
+	"client.integration.mca.HairLayerMixin",
 	"client.MobEntityRendererMixin",
 	"client.PlayerEntityRendererMixin",
 	"client.TexturedRenderLayersMixin"

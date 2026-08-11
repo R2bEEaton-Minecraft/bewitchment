@@ -1,6 +1,7 @@
 # gradle
 
 .gradle/
+.gradle-runclient/
 .gradle-forge-port/
 build/
 build-forge-port/
@@ -35,6 +36,10 @@ bin/
 # fabric
 
 run/
+
+# port testing scratch
+
+port-testing/
 
 # java
 

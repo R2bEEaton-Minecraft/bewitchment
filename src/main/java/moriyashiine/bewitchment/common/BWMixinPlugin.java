@@ -27,6 +27,9 @@ public class BWMixinPlugin implements IMixinConfigPlugin {
 		if (mixinClassName.startsWith("moriyashiine.bewitchment.mixin.integration.apoli")) {
 			return FabricLoader.getInstance().isModLoaded("apoli");
 		}
+		if (mixinClassName.startsWith("moriyashiine.bewitchment.mixin.client.integration.mca")) {
+			return FabricLoader.getInstance().isModLoaded("mca");
+		}
 		return true;
 	}
 

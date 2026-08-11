@@ -83,6 +83,12 @@ dependencies {
     modCompileOnly "maven.modrinth:emi:${emi_version}+forge"
     modRuntimeOnly "maven.modrinth:emi:${emi_version}+forge"
 
+    // Development-only compatibility test target. MCA remains optional for
+    // released Bewitchment builds, but is loaded by runClient for integration
+    // testing of werewolf villager conversion.
+    modRuntimeOnly "maven.modrinth:lhGA9TYQ:1MKTLiiG"
+    modRuntimeOnly "maven.modrinth:1W98a849:8usaek7X"
+
     mixinExtrasDev "io.github.llamalad7:mixinextras-forge:0.4.1"
 }
 

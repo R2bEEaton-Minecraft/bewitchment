@@ -16,6 +16,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
@@ -24,6 +25,7 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -38,8 +40,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 @SuppressWarnings("ConstantConditions")
 public class WerewolfEntity extends BWHostileEntity {
+	private static final String MCA_FALLBACK_HAIR = "mca:missing";
+	private static final String MCA_FALLBACK_CLOTHES = "mca:skins/clothing/normal/neutral/none/3.png";
+
 	public NbtCompound storedVillager;
 
 	public WerewolfEntity(EntityType<? extends HostileEntity> entityType, World world) {
@@ -68,10 +75,11 @@ public class WerewolfEntity extends BWHostileEntity {
 			if (storedVillager != null && age % 20 == 0 && (getWorld().isDay() || BewitchmentAPI.getMoonPhase(getWorld()) != 0)) {
 				VillagerEntity entity = createVillager(getWorld(), storedVillager);
 				if (entity != null) {
-					// MCA assigns its genetics, skin, relationships, and AI during
-					// initialization.  This must happen before applying the saved
-					// vanilla villager data from the werewolf transformation.
-					entity.initialize((ServerWorldAccess) getWorld(), getWorld().getLocalDifficulty(getBlockPos()), SpawnReason.CONVERSION, null, null);
+					// MCA deliberately preserves its existing appearance for CONVERSION
+					// spawns.  This entity is newly created, though, so use an event spawn
+					// to initialize its genetics, skin, clothing, relationships, and AI
+					// before we restore the saved vanilla villager data below.
+					entity.initialize((ServerWorldAccess) getWorld(), getWorld().getLocalDifficulty(getBlockPos()), SpawnReason.EVENT, null, null);
 					PlayerLookup.tracking(this).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, this));
 					getWorld().playSound(null, getX(), getY(), getZ(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, getSoundCategory(), getSoundVolume(), getSoundPitch());
 					if (!isMcaVillager(entity)) {
@@ -88,6 +96,13 @@ public class WerewolfEntity extends BWHostileEntity {
 					}));
 					BWComponents.WEREWOLF_VILLAGER_COMPONENT.get(entity).setStoredWerewolf(writeNbt(new NbtCompound()));
 					getWorld().spawnEntity(entity);
+					// MCA stores its appearance in tracked data.  Apply a fallback only
+					// after spawning, so the correction is delivered to clients as an
+					// entity-data update instead of being missed by the spawn packet.
+					if (isMcaVillager(entity)) {
+						ensureMcaAppearance(entity);
+						syncTrackedData(entity);
+					}
 					remove(RemovalReason.DISCARDED);
 				}
 			}
@@ -123,7 +138,43 @@ public class WerewolfEntity extends BWHostileEntity {
 	}
 
 	private static boolean isMcaVillager(VillagerEntity villager) {
-		return villager.getClass().getName().startsWith("net.mca.");
+		String className = villager.getClass().getName();
+		// Architectury retains the platform prefix for MCA's Forge classes.
+		return className.startsWith("net.mca.") || className.startsWith("forge.net.mca.");
+	}
+
+	/**
+	 * MCA can occasionally select an empty appearance entry for a newly spawned
+	 * baby.  Its renderer has no fallback for empty strings, so retain every
+	 * valid randomized value and replace only missing layer identifiers.
+	 */
+	private static void ensureMcaAppearance(VillagerEntity villager) {
+		NbtCompound nbt = villager.writeNbt(new NbtCompound());
+		boolean changed = false;
+		if (nbt.getString("hair").isEmpty()) {
+			nbt.putString("hair", MCA_FALLBACK_HAIR);
+			changed = true;
+		}
+		if (nbt.getString("clothes").isEmpty()) {
+			nbt.putString("clothes", MCA_FALLBACK_CLOTHES);
+			changed = true;
+		}
+		if (changed) {
+			villager.readNbt(nbt);
+		}
+	}
+
+	/**
+	 * The replacement is created during the old entity's tick.  MCA's skin data
+	 * lives in tracked values, which can otherwise miss the first client update
+	 * in that handoff; a relog works only because it sends that data again.
+	 */
+	private void syncTrackedData(VillagerEntity villager) {
+		List<DataTracker.SerializedEntry<?>> trackedData = villager.getDataTracker().getDirtyEntries();
+		if (trackedData != null) {
+			EntityTrackerUpdateS2CPacket packet = new EntityTrackerUpdateS2CPacket(villager.getId(), trackedData);
+			PlayerLookup.tracking(this).forEach(player -> player.networkHandler.sendPacket(packet));
+		}
 	}
 
 	@Override
