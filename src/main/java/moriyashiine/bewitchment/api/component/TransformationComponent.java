@@ -67,6 +67,14 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 			setTransformation(BWRegistries.TRANSFORMATION.get(new Identifier(tag.getString("Transformation"))));
 		}
 		setAlternateForm(tag.getBoolean("AlternateForm"));
+		// Transformation state is synchronized as component data.  The server
+		// resizes the player when that state changes, but the local player does
+		// not receive a corresponding size update packet.  Recalculate here so
+		// the client restores its normal eye height immediately after leaving an
+		// alternate form instead of retaining the bat/werewolf camera position.
+		if (obj.getWorld().isClient()) {
+			obj.calculateDimensions();
+		}
 	}
 
 	@SuppressWarnings({"ConstantConditions"})
