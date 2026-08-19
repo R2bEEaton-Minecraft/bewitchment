@@ -31,7 +31,11 @@ public final class BewitchmentForgeTransformationEvents {
 			return;
 		}
 		BWComponents.TRANSFORMATION_COMPONENT.maybeGet(player).ifPresent(transformation -> {
+			EntityDimensions baseDimensions = player.getDimensions(event.getPose());
+			float baseEyeHeight = player.getEyeHeightAccess(event.getPose(), baseDimensions);
 			if (!transformation.isAlternateForm()) {
+				event.setNewSize(baseDimensions);
+				event.setNewEyeHeight(baseEyeHeight);
 				return;
 			}
 			EntityDimensions dimensions = null;
@@ -41,9 +45,10 @@ public final class BewitchmentForgeTransformationEvents {
 				dimensions = BWEntityTypes.WEREWOLF.getDimensions();
 			}
 			if (dimensions != null) {
-				float scale = dimensions.height / event.getOldSize().height;
 				event.setNewSize(dimensions);
-				event.setNewEyeHeight(event.getOldEyeHeight() * scale);
+				// PlayerEntity's eye-height method ignores the supplied dimensions,
+				// so scale its pose-specific eye height to the target form explicitly.
+				event.setNewEyeHeight(baseEyeHeight * dimensions.height / baseDimensions.height);
 			}
 		});
 	}

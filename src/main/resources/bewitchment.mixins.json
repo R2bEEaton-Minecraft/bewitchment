@@ -83,6 +83,7 @@
 	"client": [
 	"client.AbstractClientPlayerEntityMixin",
 	"client.BedBlockEntityRendererMixin",
+	"client.CameraMixin",
 	"client.ClientWorldMixin",
 	"client.EntityRenderDispatcherMixin",
 	"client.GameRendererMixin",
