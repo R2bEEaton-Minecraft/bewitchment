@@ -26,6 +26,18 @@ class TransformationStateTest {
 	}
 
 	@Test
+	void refreshingTwiceRunsBothPassesPerChange() {
+		AtomicInteger refreshes = new AtomicInteger();
+		TransformationState state = new TransformationState(new Transformation(), TransformationState.refreshingTwice(refreshes::incrementAndGet));
+
+		state.setAlternateForm(true);
+
+		// The second pass is what recomputes eye height against the size the
+		// first pass installed, so it must not be collapsed away.
+		assertEquals(2, refreshes.get());
+	}
+
+	@Test
 	void changingTransformationInvalidatesDimensionsExactlyOnce() {
 		AtomicInteger invalidations = new AtomicInteger();
 		Transformation original = new Transformation();

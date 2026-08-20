@@ -58,7 +58,7 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 
 	public TransformationComponent(PlayerEntity obj) {
 		this.obj = obj;
-		this.state = new TransformationState(BWTransformations.HUMAN, obj::calculateDimensions);
+		this.state = new TransformationState(BWTransformations.HUMAN, TransformationState.refreshingTwice(obj::calculateDimensions));
 	}
 
 	@Override

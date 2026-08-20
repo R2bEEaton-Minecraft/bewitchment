@@ -8,6 +8,7 @@ import moriyashiine.bewitchment.api.BewitchmentAPI;
 import moriyashiine.bewitchment.common.registry.BWComponents;
 import moriyashiine.bewitchment.common.registry.BWEntityTypes;
 import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +23,18 @@ import net.minecraftforge.event.entity.EntityEvent;
  * ability flags here.
  */
 public final class BewitchmentForgeTransformationEvents {
+	private static final float VANILLA_STANDING_HEIGHT = EntityType.PLAYER.getDimensions().height;
+
 	private BewitchmentForgeTransformationEvents() {
+	}
+
+	/** PlayerEntity's own pose eye heights, free of any modded scaling. */
+	private static float vanillaEyeHeight(EntityPose pose) {
+		return switch (pose) {
+			case SWIMMING, FALL_FLYING, SPIN_ATTACK -> 0.4f;
+			case CROUCHING -> 1.27f;
+			default -> 1.62f;
+		};
 	}
 
 	/** Shrinks a bat-form vampire and enlarges a beast-form werewolf. */
@@ -46,9 +58,14 @@ public final class BewitchmentForgeTransformationEvents {
 			}
 			if (dimensions != null) {
 				event.setNewSize(dimensions);
-				// PlayerEntity's eye-height method ignores the supplied dimensions,
-				// so scale its pose-specific eye height to the target form explicitly.
-				event.setNewEyeHeight(baseEyeHeight * dimensions.height / baseDimensions.height);
+				// PlayerEntity's eye-height method ignores the supplied dimensions, so
+				// scale a pose-specific eye height to the target form explicitly.  The
+				// unmodified vanilla heights are used rather than the player's own: an
+				// alternate form wears a bat or werewolf body, so a mod scaling the
+				// human body (Minecraft Comes Alive does, and clamps that scaling
+				// against the player's current height) must not be folded in on top of
+				// the form's proportions.
+				event.setNewEyeHeight(vanillaEyeHeight(event.getPose()) * dimensions.height / VANILLA_STANDING_HEIGHT);
 			}
 		});
 	}
