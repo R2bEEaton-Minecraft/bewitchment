@@ -54,11 +54,11 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 	private static final EntityAttributeModifier WEREWOLF_MOVEMENT_SPEED_MODIFIER_1 = new EntityAttributeModifier(UUID.fromString("718104a6-aa19-4b53-bad9-1f9edd46d38a"), "Transformation modifier", 0.16, EntityAttributeModifier.Operation.ADDITION);
 
 	private final PlayerEntity obj;
-	private Transformation transformation = BWTransformations.HUMAN;
-	private boolean alternateForm = false;
+	private final TransformationState state;
 
 	public TransformationComponent(PlayerEntity obj) {
 		this.obj = obj;
+		this.state = new TransformationState(BWTransformations.HUMAN, obj::calculateDimensions);
 	}
 
 	@Override
@@ -67,14 +67,6 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 			setTransformation(BWRegistries.TRANSFORMATION.get(new Identifier(tag.getString("Transformation"))));
 		}
 		setAlternateForm(tag.getBoolean("AlternateForm"));
-		// Transformation state is synchronized as component data.  The server
-		// resizes the player when that state changes, but the local player does
-		// not receive a corresponding size update packet.  Recalculate here so
-		// the client restores its normal eye height immediately after leaving an
-		// alternate form instead of retaining the bat/werewolf camera position.
-		if (obj.getWorld().isClient()) {
-			obj.calculateDimensions();
-		}
 	}
 
 	@SuppressWarnings({"ConstantConditions"})
@@ -165,22 +157,22 @@ public class TransformationComponent implements AutoSyncedComponent, ServerTicki
 	}
 
 	public Transformation getTransformation() {
-		return transformation;
+		return state.getTransformation();
 	}
 
 	public void setTransformation(Transformation transformation) {
 		OnTransformationSet.EVENT.invoker().onTransformationSet(obj, transformation);
-		this.transformation = transformation;
+		state.setTransformation(transformation);
 		BWComponents.TRANSFORMATION_COMPONENT.sync(obj);
 		updateAttributes();
 	}
 
 	public boolean isAlternateForm() {
-		return alternateForm;
+		return state.isAlternateForm();
 	}
 
 	public void setAlternateForm(boolean alternateForm) {
-		this.alternateForm = alternateForm;
+		state.setAlternateForm(alternateForm);
 		BWComponents.TRANSFORMATION_COMPONENT.sync(obj);
 		updateAttributes();
 	}

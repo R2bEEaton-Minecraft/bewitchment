@@ -90,6 +90,8 @@ dependencies {
     modRuntimeOnly "maven.modrinth:1W98a849:8usaek7X"
 
     mixinExtrasDev "io.github.llamalad7:mixinextras-forge:0.4.1"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.3"
 }
 
 // Architectury Loom remaps Forgified Fabric API into Yarn names but removes its
@@ -159,6 +161,10 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
     options.release = 17
     options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 java {

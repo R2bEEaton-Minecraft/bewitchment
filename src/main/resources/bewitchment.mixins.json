@@ -83,10 +83,10 @@
 	"client": [
 	"client.AbstractClientPlayerEntityMixin",
 	"client.BedBlockEntityRendererMixin",
-	"client.CameraMixin",
 	"client.ClientWorldMixin",
 	"client.EntityRenderDispatcherMixin",
 	"client.GameRendererMixin",
+	"client.LimbAnimatorAccessor",
 	"client.HeldItemFeatureRendererMixin",
 	"client.InGameHudMixin",
 	"client.integration.mca.ClothingLayerMixin",

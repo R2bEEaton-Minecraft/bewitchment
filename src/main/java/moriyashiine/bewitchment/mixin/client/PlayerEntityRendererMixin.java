@@ -8,6 +8,7 @@ import moriyashiine.bewitchment.api.BewitchmentAPI;
 import moriyashiine.bewitchment.api.entity.BroomEntity;
 import moriyashiine.bewitchment.client.misc.PolymorphDisguise;
 import moriyashiine.bewitchment.client.render.ContributorHornsFeatureRenderer;
+import moriyashiine.bewitchment.client.render.TransformedPlayerRenderState;
 import moriyashiine.bewitchment.common.block.CoffinBlock;
 import moriyashiine.bewitchment.common.registry.BWComponents;
 import net.minecraft.client.MinecraftClient;
@@ -70,7 +71,7 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
 			entity.age = player.age;
 			entity.hurtTime = player.hurtTime;
 			entity.maxHurtTime = Integer.MAX_VALUE;
-			entity.limbAnimator = player.limbAnimator;
+			TransformedPlayerRenderState.copyLimbAnimation(player.limbAnimator, entity.limbAnimator);
 			entity.headYaw = player.headYaw;
 			entity.prevHeadYaw = player.prevHeadYaw;
 			entity.bodyYaw = player.bodyYaw;

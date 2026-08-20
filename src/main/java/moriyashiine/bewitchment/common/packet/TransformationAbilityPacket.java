@@ -53,13 +53,11 @@ public class TransformationAbilityPacket {
 				world.playSound(null, player.getBlockPos(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, player.getSoundCategory(), 1, 1);
 				transformationComponent.setAlternateForm(!isAlternateForm);
 				BewitchmentForgeTransformationEvents.setVampireFlight(player, !isAlternateForm);
-				player.calculateDimensions();
 			} else if (transformationComponent.getTransformation() == BWTransformations.WEREWOLF && (forced || BewitchmentAPI.isPledged(player, BWPledges.HERNE))) {
 				PlayerLookup.tracking(player).forEach(trackingPlayer -> SpawnSmokeParticlesPacket.send(trackingPlayer, player));
 				SpawnSmokeParticlesPacket.send((ServerPlayerEntity) player, player);
 				world.playSound(null, player.getBlockPos(), BWSoundEvents.ENTITY_GENERIC_TRANSFORM, player.getSoundCategory(), 1, 1);
 				transformationComponent.setAlternateForm(!isAlternateForm);
-				player.calculateDimensions();
 				if (isAlternateForm && player.hasStatusEffect(StatusEffects.NIGHT_VISION) && player.getStatusEffect(StatusEffects.NIGHT_VISION).isAmbient()) {
 					player.removeStatusEffect(StatusEffects.NIGHT_VISION);
 				}
